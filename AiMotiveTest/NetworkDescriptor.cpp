@@ -51,6 +51,7 @@ void NetworkDescriptor::readDescription(const std::string & iFileName)
 					case 'p': newLayer.first = LayerTypes::Pooling; break;
 					case 'f': newLayer.first = LayerTypes::FullyConnected; break;
 					case 'o': newLayer.first = LayerTypes::Output; break;
+					default: break;
 				}
 
 				

@@ -68,7 +68,10 @@ void Network::initialize(const std::string & networkDescriptionFile, const int &
 			}
 			case NetworkDescriptor::Pooling:
 			{
-				PoolingLayer * pNewLayer = new PoolingLayer(std::get<1>(itPrescripedLayer->second), std::get<2>(itPrescripedLayer->second));
+				int wNumOfInputFeatureMaps = mLayers.back()->getOutPutSize();
+				int wSizeOfPrevLayerX = mLayers.back()->getSizeX();
+				int wSizeOfPrevLayerY = mLayers.back()->getSizeY();
+				PoolingLayer * pNewLayer = new PoolingLayer(std::get<1>(itPrescripedLayer->second), std::get<2>(itPrescripedLayer->second), PoolingLayer::Max, wNumOfInputFeatureMaps, wSizeOfPrevLayerX, wSizeOfPrevLayerY); //This could be easily set to be dynamicly read from config file.
 				mLayers.push_back(pNewLayer);
 				std::cout << "Pooling layer added with size: " << pNewLayer->getSizeX() << "x" << pNewLayer->getSizeY() << " as the " << mLayers.size()-1 << "th layer.\n";
 				break;
@@ -85,6 +88,10 @@ void Network::initialize(const std::string & networkDescriptionFile, const int &
 				OutputLayer * pNewLayer = new OutputLayer(std::get<1>(itPrescripedLayer->second), std::get<2>(itPrescripedLayer->second));
 				mLayers.push_back(pNewLayer);
 				std::cout << "Output layer added with size: " << pNewLayer->getSizeX() << "x" << pNewLayer->getSizeY() << " as the " << mLayers.size() - 1 << "th, last layer.\n";
+				break;
+			}
+			default:
+			{
 				break;
 			}
 		}
