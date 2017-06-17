@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "OutputLayer.h"
 //#include "Dense"
-
+#include <map>
 OutputLayer::OutputLayer()
 {
 }
@@ -17,12 +17,17 @@ OutputLayer::~OutputLayer()
 {
 }
 
-Eigen::MatrixXd OutputLayer::feedForward()
+void OutputLayer::feedForward(Layer * pNextLayer)
 {//mock
-	return Eigen::MatrixXd();
 }
 
-Eigen::MatrixXd OutputLayer::backPropagate()
+std::map<char, Eigen::MatrixXd> OutputLayer::backPropagate()
 {//mock
-	return Eigen::MatrixXd();
+	std::map<char, Eigen::MatrixXd> fake;
+	return fake;
 }
+
+void OutputLayer::acceptInput(const std::map<char, Eigen::MatrixXd>&)
+{
+}
+

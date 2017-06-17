@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "ConvolutionalLayer.h"
-
+#include <algorithm>
 
 ConvolutionalLayer::ConvolutionalLayer()
 {
@@ -19,18 +19,31 @@ ConvolutionalLayer::~ConvolutionalLayer()
 
 void ConvolutionalLayer::convolve()
 {
-
+	for_each(mKernels.begin(), mKernels.end(), [](Eigen::MatrixXd & Kernel)
+		{
+			
+		}
+	);
+		
 
 
 
 }
 
-Eigen::MatrixXd ConvolutionalLayer::feedForward()
-{//mock
-	return Eigen::MatrixXd(1,1);
+void ConvolutionalLayer::feedForward(Layer * pNextLayer)
+{
+	convolve();
+	pNextLayer->acceptInput(mOutput);
 }
 
-Eigen::MatrixXd ConvolutionalLayer::backPropagate()
+std::map<char, Eigen::MatrixXd> ConvolutionalLayer::backPropagate()
 {//MOCK
-	return Eigen::MatrixXd(1, 1);
+	std::map<char, Eigen::MatrixXd> fake;
+	return fake;
+}
+
+
+void ConvolutionalLayer::acceptInput(const std::map<char, Eigen::MatrixXd>& iInputMap)
+{
+	mInput = iInputMap;
 }

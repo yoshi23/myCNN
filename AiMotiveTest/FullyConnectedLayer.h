@@ -9,8 +9,9 @@ public:
 	FullyConnectedLayer(const int & iSizeX, const int & iSizeY);
 	~FullyConnectedLayer();
 
-	virtual Eigen::MatrixXd feedForward();
-	virtual Eigen::MatrixXd backPropagate();
+	void feedForward(Layer * pNextLayer);
+	virtual std::map<char, Eigen::MatrixXd> backPropagate();
+	void acceptInput(const std::map<char, Eigen::MatrixXd>&);
 
 };
 

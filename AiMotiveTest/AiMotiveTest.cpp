@@ -12,6 +12,8 @@
 
 
 
+#include "ConvolutionalLayer.h"
+
 int main()
 {
 
@@ -25,23 +27,14 @@ int main()
 
 	IoHandler::rgbPixelMap inputImage = wIoHandler.loadImage("..\\images\\train52\\6\\6_0093.bmp");
 
-	/*for (int i = 0; i < 52; ++i) {
-		for (int j = 0; j < 52; ++j) {
-			std::cout << inputImage.at('r')(j, i) << "," << inputImage.at('g')(j, i) << "," << inputImage.at('b')(j, i) << std::endl;
-			std::cout << "******\n";
-			//std::cout << retPixelsR(j, i) << "," << retPixelsG(j, i) << "," << retPixelsB(j, i) << std::endl;
-		}
-	}*/
-	//wIoHandler.writePixelMapToFile(wIoHandler.loadImage("..\\images\\train52\\6\\6_0093.bmp"));
-
-	if (inputImage.size() > 0)
+	/*if (inputImage.size() > 0)
 	{
 		wIoHandler.writePixelMapToFile(inputImage);	
 	}
 	else
 	{
 		std::cout << "file was not read properly\n";
-	}
+	}*/
 
 	/*bitmap_image image("..\\images\\train52\\1\\1_0001.bmp");
 	//bitmap_image image("..\\images\\train52\\1\\output.bmp");
@@ -74,19 +67,51 @@ int main()
 	printf("Number of pixels with red >= 111: %d\n", total_number_of_pixels);*/
 	
 
-	/*Eigen::MatrixXd m(2, 2);
-	m(0, 0) = 3;
-	m(1, 0) = 2.5;
-	m(0, 1) = -1;
-	m(1, 1) = m(1, 0) + m(0, 1);
-	//std::cout<<std::endl << m << std::endl;
+	Eigen::MatrixXd m(5, 5);
+	m(0, 0) = 1;
+	m(0, 1) = 2;
+	m(0, 2) = 3;
+	m(0, 3) = 4;
+	m(0, 4) = 5;
+	m(1, 0) = 6;
+	m(1, 1) = 7;
+	m(1, 2) = 8;
+	m(1, 3) = 9;
+	m(1, 4) = 10;
+	m(2, 0) = 11;
+	m(2, 1) = 12;
+	m(2, 2) = 13;
+	m(2, 3) = 14;
+	m(2, 4) = 15;
+	m(3, 0) = 16;
+	m(3, 1) = 17;
+	m(3, 2) = 18;
+	m(3, 3) = 19;
+	m(3, 4) = 20;
+	m(4, 0) = 21;
+	m(4, 1) = 22;
+	m(4, 2) = 23;
+	m(4, 3) = 24;
+	m(4, 4) = 25;
 
-	Eigen::MatrixXd n(3, 2);
-	Eigen::MatrixXd na(0,0);
+	std::cout << std::endl << m << std::endl;
+
+	Eigen::MatrixXd n(3, 3);
+	//Eigen::MatrixXd na(0,0);
 	n(0, 0) = 1;
-	n(1, 0) = 0;
-	n(0, 1) = 0;
-	n(1, 1) = 1;*/
+	n(0, 1) = 2;
+	n(0, 2) = 3;
+	n(1, 0) = 4;
+	n(1, 1) = 5;
+	n(1, 2) = 6;
+	n(2, 0) = 7;
+	n(2, 1) = 8;
+	n(2, 2) = 9;
+
+	ConvolutionalLayer wConvolutionalLayer;
+	Eigen::MatrixXd res = wConvolutionalLayer.convolution(m, n, Layer::Full); // Layer::Valid);
+
+	std::cout << "\n\n" << res << std::endl;
 //	std::cout << std::endl << m.*n << std::endl;
 
     return 0;

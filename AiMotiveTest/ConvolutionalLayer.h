@@ -12,12 +12,14 @@ public:
 
 	void convolve();
 
-	virtual Eigen::MatrixXd feedForward();
-	virtual Eigen::MatrixXd backPropagate();
+	virtual void feedForward(Layer * pNextLayer);
+	virtual std::map<char, Eigen::MatrixXd> backPropagate();
+	void acceptInput(const std::map<char, Eigen::MatrixXd>&);
 
 private:
 
 	std::vector<Eigen::MatrixXd> mKernels;
+	double mBias;
 
 };
 

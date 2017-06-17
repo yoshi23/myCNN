@@ -90,3 +90,17 @@ void Network::initialize(const std::string & networkDescriptionFile, const int &
 
 	}
 }
+
+/*
+void run()
+{
+	it = mLayers.begin()
+		it->receiveInput(image...);
+
+	while (it != mLayers.back())
+	{
+		it->feedforward(++it);
+	}
+	it.provideOutput();
+
+}*/

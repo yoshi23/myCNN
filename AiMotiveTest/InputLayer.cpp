@@ -1,7 +1,8 @@
 #include "stdafx.h"
 #include "InputLayer.h"
+#include "Layer.h"
 //#include "Dense"
-
+#include <map>
 InputLayer::InputLayer()
 {
 }
@@ -12,14 +13,20 @@ InputLayer::InputLayer(const int & iSizeX, const int & iSizeY)
 	mSizeY = iSizeY;
 }
 
-Eigen::MatrixXd InputLayer::feedForward()
+void InputLayer::feedForward(Layer * pNextLayer)
 {
-	return mOutput;
+	pNextLayer->acceptInput(mInputImage);
 }
 
-Eigen::MatrixXd InputLayer::backPropagate()
+std::map<char, Eigen::MatrixXd> InputLayer::backPropagate()
 {//mock
-	return Eigen::MatrixXd(1, 1);
+	std::map<char, Eigen::MatrixXd> fake;
+	return fake;
+}
+
+void InputLayer::acceptInput(const IoHandler::rgbPixelMap & iImage)
+{
+	mInput = iImage;
 }
 
 

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "PoolingLayer.h"
 //#include "Dense"
-
+#include <map>
 PoolingLayer::PoolingLayer()
 {
 }
@@ -16,12 +16,16 @@ PoolingLayer::~PoolingLayer()
 {
 }
 
-Eigen::MatrixXd PoolingLayer::feedForward()
+void PoolingLayer::feedForward(Layer * pNextLayer)
 {//mock
-	return Eigen::MatrixXd();
+	std::map<char, Eigen::MatrixXd> fake;
+	//return fake;
 }
 
-Eigen::MatrixXd PoolingLayer::backPropagate()
+std::map<char, Eigen::MatrixXd> PoolingLayer::backPropagate()
 {//mock
-	return Eigen::MatrixXd();
+	std::map<char, Eigen::MatrixXd> fake;
+	return fake;
 }
+
+void PoolingLayer::acceptInput(const std::map<char, Eigen::MatrixXd>&) {}

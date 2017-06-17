@@ -45,8 +45,6 @@ IoHandler::rgbPixelMap IoHandler::loadImage(const std::string & iFileName)
 	retMap.insert(std::make_pair('g', retPixelsG));
 	retMap.insert(std::make_pair('b', retPixelsB));
 
-	writePixelMapToFile(retMap);
-
 	return retMap;
 }
 
