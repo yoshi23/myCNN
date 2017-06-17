@@ -1,5 +1,6 @@
 #pragma once
 #include "Layer.h"
+//#include "Dense"
 class FullyConnectedLayer :
 	public Layer
 {
@@ -8,8 +9,8 @@ public:
 	FullyConnectedLayer(const int & iSizeX, const int & iSizeY);
 	~FullyConnectedLayer();
 
-	virtual void feedForward();
-	virtual void backPropagate();
+	virtual Eigen::MatrixXd feedForward();
+	virtual Eigen::MatrixXd backPropagate();
 
 };
 

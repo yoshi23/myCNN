@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "PoolingLayer.h"
-
+//#include "Dense"
 
 PoolingLayer::PoolingLayer()
 {
@@ -16,10 +16,12 @@ PoolingLayer::~PoolingLayer()
 {
 }
 
-void PoolingLayer::feedForward()
-{
+Eigen::MatrixXd PoolingLayer::feedForward()
+{//mock
+	return Eigen::MatrixXd();
 }
 
-void PoolingLayer::backPropagate()
-{
+Eigen::MatrixXd PoolingLayer::backPropagate()
+{//mock
+	return Eigen::MatrixXd();
 }

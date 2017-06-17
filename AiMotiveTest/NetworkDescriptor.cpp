@@ -4,6 +4,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <tuple>
 
 NetworkDescriptor::NetworkDescriptor()
 {
@@ -21,10 +22,11 @@ void NetworkDescriptor::readDescription(const std::string & iFileName)
 	std::string line;
 	std::stringstream sst;
 	std::string words;
-	char comma;
+	char separationSymbols;
 
 	std::string layerType;
 	int ord = 0, m = 0, n = 0;
+	int numOfFilters = 0;
 
 	if (configFile.is_open())
 	{
@@ -39,25 +41,39 @@ void NetworkDescriptor::readDescription(const std::string & iFileName)
 
 				switch (layerType[0])
 				{
-					case 'c': newLayer.first = LayerTypes::Convolutional; break;
+					case 'c':
+					{
+						newLayer.first = LayerTypes::Convolutional;
+						sst >> numOfFilters;
+						sst >> separationSymbols;
+						break;
+					}
 					case 'p': newLayer.first = LayerTypes::Pooling; break;
 					case 'f': newLayer.first = LayerTypes::FullyConnected; break;
 					case 'o': newLayer.first = LayerTypes::Output; break;
 				}
 
+				
 				sst >> m;
 				if (newLayer.first == Convolutional || newLayer.first == Pooling)
 				{
-					sst >> comma;
-					sst >> n;		
-					newLayer.second = std::pair<int, int>(m, n);
+					sst >> separationSymbols;
+					sst >> n;	
+					if (newLayer.first == Convolutional)
+					{
+						newLayer.second = std::tuple<int, int, int>(numOfFilters, m, n);
+					}
+					else
+					{
+						newLayer.second = std::tuple<int, int, int>(1, m, n);
+					}
+					
 				}
 				else
 				{
-					newLayer.second = std::pair<int, int>(m, 1);
+					newLayer.second = std::tuple<int, int, int>(1, m, 1);
 				}
 				mStructure.push_back(newLayer);
-				//std::cout << ord<<"  /nL: "<< newLayer.first<< " / "<<" /m: "<< newLayer.second.first << " /n: "<< newLayer.second.second  <<std::endl;
 				sst.str(std::string());
 				sst.clear();
 			}

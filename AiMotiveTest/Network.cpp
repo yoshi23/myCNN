@@ -21,10 +21,10 @@ Network::Network()
 
 Network::~Network()
 {
-	for_each(mLayers.begin(), mLayers.end(), [](Layer * iL) 
-	{
-		delete iL;
-	}
+	for_each(mLayers.begin(), mLayers.end(), [](Layer * pLayer) 
+		{
+			delete pLayer;
+		}
 	);
 }
 
@@ -33,7 +33,7 @@ void Network::initialize(const std::string & networkDescriptionFile, const int &
 	mLayers.resize(0);
 	InputLayer * pInputLayer = new InputLayer(iInputSizeX, iInputSizeY);
 	mLayers.push_back(pInputLayer);
-	std::cout << "Input layer added with size: " << pInputLayer->getSizeX() << "x" << pInputLayer->getSizeY() << " as the " << mLayers.size() << "st layer.\n";
+	std::cout << "Input layer added with size: " << pInputLayer->getSizeX() << "x" << pInputLayer->getSizeY() << " as the 0th layer.\n";
 
 
 	NetworkDescriptor wNetworkDescriptor;
@@ -51,34 +51,39 @@ void Network::initialize(const std::string & networkDescriptionFile, const int &
 				//Size of network is calculated from the kernel sizes:
 				int wPrevLayerWidth = mLayers.back()->getSizeY();
 				int wPrevLayerHeight = mLayers.back()->getSizeX();
-				int wNewLayerWidth = wPrevLayerWidth - itPrescripedLayer->second.second + 1;
-				int wNewLayerHeight = wPrevLayerHeight - itPrescripedLayer->second.first + 1;
-				ConvolutionalLayer * pNewLayer = new ConvolutionalLayer(wNewLayerWidth, wNewLayerHeight);
+				int wNumOfFilters = std::get<0>(itPrescripedLayer->second);
+				int wFilterWidth = std::get<2>(itPrescripedLayer->second);
+				int wFilterHeight = std::get<1>(itPrescripedLayer->second);
+				int wNewLayerWidth = wPrevLayerWidth - std::get<2>(itPrescripedLayer->second) + 1;
+				int wNewLayerHeight = wPrevLayerHeight - std::get<1>(itPrescripedLayer->second) + 1;
+				ConvolutionalLayer * pNewLayer = new ConvolutionalLayer(wNewLayerWidth, wNewLayerHeight, wNumOfFilters, wFilterWidth, wFilterHeight);
 				mLayers.push_back(pNewLayer);
 
-				std::cout << "Convolutional layer added with size: " << pNewLayer->getSizeX() << "x" << pNewLayer->getSizeY() << " as the " << mLayers.size() << "th layer.\n";
+				std::cout << "Convolutional layer added with size: " << wNewLayerWidth << "x" << wNewLayerHeight
+					<< "\n\t\twith " << wNumOfFilters << " filters of size: " << wFilterWidth << "x" << wFilterHeight
+					<< "; as the " << mLayers.size() - 1 << "th layer.\n";
 
 				break;
 			}
 			case NetworkDescriptor::Pooling:
 			{
-				PoolingLayer * pNewLayer = new PoolingLayer(itPrescripedLayer->second.first, itPrescripedLayer->second.second);
+				PoolingLayer * pNewLayer = new PoolingLayer(std::get<1>(itPrescripedLayer->second), std::get<2>(itPrescripedLayer->second));
 				mLayers.push_back(pNewLayer);
-				std::cout << "Pooling layer added with size: " << pNewLayer->getSizeX() << "x" << pNewLayer->getSizeY() << " as the " << mLayers.size() << "th layer.\n";
+				std::cout << "Pooling layer added with size: " << pNewLayer->getSizeX() << "x" << pNewLayer->getSizeY() << " as the " << mLayers.size()-1 << "th layer.\n";
 				break;
 			}
 			case NetworkDescriptor::FullyConnected:
 			{
-				FullyConnectedLayer * pNewLayer = new FullyConnectedLayer(itPrescripedLayer->second.first, itPrescripedLayer->second.second);
+				FullyConnectedLayer * pNewLayer = new FullyConnectedLayer(std::get<1>(itPrescripedLayer->second), std::get<2>(itPrescripedLayer->second));
 				mLayers.push_back(pNewLayer);
-				std::cout << "FullyConnected layer added with size: " << pNewLayer->getSizeX() << "x" << pNewLayer->getSizeY() << " as the " << mLayers.size() << "th layer.\n";
+				std::cout << "FullyConnected layer added with size: " << pNewLayer->getSizeX() << "x" << pNewLayer->getSizeY() << " as the " << mLayers.size() - 1 << "th layer.\n";
 				break;
 			}	
 			case NetworkDescriptor::Output:
 			{
-				OutputLayer * pNewLayer = new OutputLayer(itPrescripedLayer->second.first, itPrescripedLayer->second.second);
+				OutputLayer * pNewLayer = new OutputLayer(std::get<1>(itPrescripedLayer->second), std::get<2>(itPrescripedLayer->second));
 				mLayers.push_back(pNewLayer);
-				std::cout << "Output layer added with size: " << pNewLayer->getSizeX() << "x" << pNewLayer->getSizeY() << " as the " << mLayers.size() << "th, last layer.\n";
+				std::cout << "Output layer added with size: " << pNewLayer->getSizeX() << "x" << pNewLayer->getSizeY() << " as the " << mLayers.size() - 1 << "th, last layer.\n";
 				break;
 			}
 		}

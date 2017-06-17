@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "InputLayer.h"
-
+//#include "Dense"
 
 InputLayer::InputLayer()
 {
@@ -12,12 +12,14 @@ InputLayer::InputLayer(const int & iSizeX, const int & iSizeY)
 	mSizeY = iSizeY;
 }
 
-void InputLayer::feedForward()
+Eigen::MatrixXd InputLayer::feedForward()
 {
+	return mOutput;
 }
 
-void InputLayer::backPropagate()
-{
+Eigen::MatrixXd InputLayer::backPropagate()
+{//mock
+	return Eigen::MatrixXd(1, 1);
 }
 
 

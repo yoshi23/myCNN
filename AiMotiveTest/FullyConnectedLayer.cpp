@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "FullyConnectedLayer.h"
 
-
+#include "Dense"
 FullyConnectedLayer::FullyConnectedLayer()
 {
 }
@@ -16,10 +16,13 @@ FullyConnectedLayer::~FullyConnectedLayer()
 {
 }
 
-void FullyConnectedLayer::feedForward()
-{
+
+Eigen::MatrixXd FullyConnectedLayer::feedForward()
+{//mock
+	return Eigen::MatrixXd(1, 1);
 }
 
-void FullyConnectedLayer::backPropagate()
-{
+Eigen::MatrixXd FullyConnectedLayer::backPropagate()
+{//mock
+	return Eigen::MatrixXd(1, 1);
 }

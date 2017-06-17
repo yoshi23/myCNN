@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <tuple>
 
 struct NetworkDescriptor
 {
@@ -17,7 +18,7 @@ struct NetworkDescriptor
 
 	void readDescription(const std::string & iFileName);
 
-	typedef std::pair<LayerTypes, std::pair<int, int> > typeAndSize; //For each layer gives the <Type, Size>.
+	typedef std::pair<LayerTypes, std::tuple<int, int, int> > typeAndSize; //For each layer gives the <Type, <num of Filters, Size> >.
 	std::vector<typeAndSize> mStructure; //Stores the order and typeAndSize information provided. 
 };
 

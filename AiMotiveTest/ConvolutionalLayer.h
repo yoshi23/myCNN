@@ -1,17 +1,23 @@
 #pragma once
 #include "Layer.h"
+#include <vector>
+#include "Dense"
 class ConvolutionalLayer :
 	public Layer
 {
 public:
 	ConvolutionalLayer();
-	ConvolutionalLayer(int width, int height);
+	ConvolutionalLayer(const int & iWidth, const int & iHeight, const int & iNumOfLayers, const int & iFilterWidth, const int & iFilterHeight);
 	~ConvolutionalLayer();
 
 	void convolve();
 
-	virtual void feedForward();
-	virtual void backPropagate();
+	virtual Eigen::MatrixXd feedForward();
+	virtual Eigen::MatrixXd backPropagate();
+
+private:
+
+	std::vector<Eigen::MatrixXd> mKernels;
 
 };
 

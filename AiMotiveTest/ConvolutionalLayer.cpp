@@ -6,7 +6,7 @@ ConvolutionalLayer::ConvolutionalLayer()
 {
 }
 
-ConvolutionalLayer::ConvolutionalLayer(int iWidth, int iHeight)
+ConvolutionalLayer::ConvolutionalLayer(const int & iWidth, const int & iHeight, const int & iNumOfLayers, const int & iFilterWidth, const int & iFilterHeight)
 {
 	mSizeX = iHeight;
 	mSizeY = iWidth;
@@ -25,10 +25,12 @@ void ConvolutionalLayer::convolve()
 
 }
 
-void ConvolutionalLayer::feedForward()
-{
+Eigen::MatrixXd ConvolutionalLayer::feedForward()
+{//mock
+	return Eigen::MatrixXd(1,1);
 }
 
-void ConvolutionalLayer::backPropagate()
-{
+Eigen::MatrixXd ConvolutionalLayer::backPropagate()
+{//MOCK
+	return Eigen::MatrixXd(1, 1);
 }

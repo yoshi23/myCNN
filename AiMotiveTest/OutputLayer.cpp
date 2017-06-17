@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "OutputLayer.h"
-
+//#include "Dense"
 
 OutputLayer::OutputLayer()
 {
@@ -17,10 +17,12 @@ OutputLayer::~OutputLayer()
 {
 }
 
-void OutputLayer::feedForward()
-{
+Eigen::MatrixXd OutputLayer::feedForward()
+{//mock
+	return Eigen::MatrixXd();
 }
 
-void OutputLayer::backPropagate()
-{
+Eigen::MatrixXd OutputLayer::backPropagate()
+{//mock
+	return Eigen::MatrixXd();
 }
