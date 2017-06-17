@@ -7,7 +7,13 @@ class ConvolutionalLayer :
 {
 public:
 	ConvolutionalLayer();
-	ConvolutionalLayer(const int & iWidth, const int & iHeight, const int & iNumOfLayers, const int & iFilterWidth, const int & iFilterHeight);
+	ConvolutionalLayer(
+		const int & iWidth,
+		const int & iHeight, 
+		const int & wNumOfInputFeatureMaps, 
+		const int & iNumOfLayers, 
+		const int & iFilterWidth, 
+		const int & iFilterHeight);
 	~ConvolutionalLayer();
 
 	void convolve();
@@ -18,8 +24,9 @@ public:
 
 private:
 
-	std::vector<Eigen::MatrixXd> mKernels;
-	double mBias;
+	typedef std::vector<Eigen::MatrixXd> Kernel; //these will comprise the depth of a kernel/filter
+	std::vector<Kernel > mKernels;
+	std::vector<Eigen::MatrixXd> mBias;
 
 };
 

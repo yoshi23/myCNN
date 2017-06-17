@@ -21,11 +21,11 @@ int main()
 
 
 	Network wNetwork;
-	wNetwork.initialize("..\\NetworkDescription.config", 52, 52); //image size 52 can be easily made dynamic of course.
+	wNetwork.initialize("..\\NetworkDescription.config", IMAGE_WIDTH, IMAGE_WIDTH); //image size IMAGE_WIDTH can be easily made dynamic of course.
+	wNetwork.run();
+	//IoHandler wIoHandler;
 
-	IoHandler wIoHandler;
-
-	IoHandler::rgbPixelMap inputImage = wIoHandler.loadImage("..\\images\\train52\\6\\6_0093.bmp");
+	//IoHandler::rgbPixelMap inputImage = wIoHandler.loadImage("..\\images\\trainIMAGE_WIDTH\\6\\6_0093.bmp");
 
 	/*if (inputImage.size() > 0)
 	{
@@ -36,8 +36,8 @@ int main()
 		std::cout << "file was not read properly\n";
 	}*/
 
-	/*bitmap_image image("..\\images\\train52\\1\\1_0001.bmp");
-	//bitmap_image image("..\\images\\train52\\1\\output.bmp");
+	/*bitmap_image image("..\\images\\trainIMAGE_WIDTH\\1\\1_0001.bmp");
+	//bitmap_image image("..\\images\\trainIMAGE_WIDTH\\1\\output.bmp");
 	
 
 	if (!image)
@@ -67,12 +67,13 @@ int main()
 	printf("Number of pixels with red >= 111: %d\n", total_number_of_pixels);*/
 	
 
-	Eigen::MatrixXd m(5, 5);
-	m(0, 0) = 1;
+	//Eigen::MatrixXd m = Eigen::MatrixXd::Random(IMAGE_WIDTH, IMAGE_WIDTH); // (10, 10, 0);// (5, 5);
+	/*m(0, 0) = 1;
 	m(0, 1) = 2;
 	m(0, 2) = 3;
 	m(0, 3) = 4;
 	m(0, 4) = 5;
+	m(0, 5) = 6;
 	m(1, 0) = 6;
 	m(1, 1) = 7;
 	m(1, 2) = 8;
@@ -92,11 +93,11 @@ int main()
 	m(4, 1) = 22;
 	m(4, 2) = 23;
 	m(4, 3) = 24;
-	m(4, 4) = 25;
+	m(4, 4) = 25;*/
 
-	std::cout << std::endl << m << std::endl;
+	//std::cout << std::endl << m << std::endl;
 
-	Eigen::MatrixXd n(3, 3);
+	/*Eigen::MatrixXd n(3, 3);
 	//Eigen::MatrixXd na(0,0);
 	n(0, 0) = 1;
 	n(0, 1) = 2;
@@ -106,12 +107,12 @@ int main()
 	n(1, 2) = 6;
 	n(2, 0) = 7;
 	n(2, 1) = 8;
-	n(2, 2) = 9;
+	n(2, 2) = 9;*/
 
-	ConvolutionalLayer wConvolutionalLayer;
-	Eigen::MatrixXd res = wConvolutionalLayer.convolution(m, n, Layer::Full); // Layer::Valid);
+	//ConvolutionalLayer wConvolutionalLayer;
+	//Eigen::MatrixXd res = wConvolutionalLayer.convolution(m, n,  Layer::Full);//Layer::Valid);//
 
-	std::cout << "\n\n" << res << std::endl;
+//	std::cout << "\n\n" << res << std::endl;
 //	std::cout << std::endl << m.*n << std::endl;
 
     return 0;

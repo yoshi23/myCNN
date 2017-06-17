@@ -3,6 +3,9 @@
 #include "Dense"
 #include <map>
 
+#define IMAGE_WIDTH 52
+#define IMAGE_HEIGHT 52
+
 class Layer
 {
 public:
@@ -24,9 +27,11 @@ public:
 
 	int getSizeX();
 	int getSizeY();
-
+	int getOutPutSize();
 
 	Eigen::MatrixXd convolution(const Eigen::MatrixXd &matrix, const Eigen::MatrixXd &kernel, const Layer::ConvolTypes & iType);
+
+	void applyActivationFunction(Eigen::MatrixXd &matrix, const double & iTau);
 
 
 

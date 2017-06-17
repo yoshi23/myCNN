@@ -2,6 +2,7 @@
 #include "Layer.h"
 
 #include <iostream>
+#include <math.h>
 
 Layer::Layer()
 {
@@ -31,7 +32,7 @@ Eigen::MatrixXd Layer::convolution(const Eigen::MatrixXd &matrix, const Eigen::M
 
 	const int wKernelHeight = kernel.rows();
 	const int wKernelWidth = kernel.cols();
-	std::cout << flippedKernel<<std::endl<<std::endl<<"ez volt a kernel\n";
+	//std::cout << flippedKernel<<std::endl<<std::endl<<"ez volt a kernel\n";
 	if (iType == ConvolTypes::Valid)
 	{
 		retMat.resize(matrix.rows() - wKernelHeight + 1, matrix.cols() - wKernelWidth + 1);
@@ -42,8 +43,8 @@ Eigen::MatrixXd Layer::convolution(const Eigen::MatrixXd &matrix, const Eigen::M
 			//std::cout << matrix.cols() - wKernelWidth<<" +++ "<< matrix.cols() - wKernelWidth << std::endl;
 			for (int j = 0; j <= matrix.cols() - wKernelWidth; j++)
 			{
-				std::cout << matrix.block(i, j, wKernelWidth, wKernelHeight) << std::endl;
-				std::cout << ((matrix.block(i, j, wKernelWidth, wKernelHeight)).cwiseProduct(flippedKernel)) << std::endl << std::endl;
+				//std::cout << matrix.block(i, j, wKernelWidth, wKernelHeight) << std::endl;
+				//std::cout << ((matrix.block(i, j, wKernelWidth, wKernelHeight)).cwiseProduct(flippedKernel)) << std::endl << std::endl;
 				retMat(x,y++) = ((matrix.block(i, j , wKernelWidth, wKernelHeight)).cwiseProduct(flippedKernel)).sum();
 
 			}
@@ -57,7 +58,7 @@ Eigen::MatrixXd Layer::convolution(const Eigen::MatrixXd &matrix, const Eigen::M
 		//MatrixXd paddedMatrix(matrix.rows() + 2*wKernelHeight - 2, matrix.cols() + 2*wKernelWidth -2);
 		MatrixXd paddedMatrix = MatrixXd::Zero(matrix.rows() + 2* wKernelHeight - 2, matrix.cols() + 2*wKernelWidth - 2);
 		paddedMatrix.block(wKernelWidth - 1, wKernelHeight - 1, matrix.rows(), matrix.cols()) = matrix;
-		std::cout << "PADDEDD:" << std::endl << paddedMatrix << std::endl;
+		//std::cout << "PADDEDD:" << std::endl << paddedMatrix << std::endl;
 		retMat.resize(matrix.rows() + wKernelHeight - 1, matrix.cols() + wKernelWidth - 1);
 		//std::cout << retMat.rows() << " //// " << retMat.cols() << std::endl;
 		int x(0), y(0);
@@ -67,8 +68,8 @@ Eigen::MatrixXd Layer::convolution(const Eigen::MatrixXd &matrix, const Eigen::M
 			for (int j = 0; j <= paddedMatrix.cols() - wKernelWidth; j++)
 			{
 
-				std::cout << paddedMatrix.block(i, j, wKernelWidth, wKernelHeight) << std::endl;
-				std::cout << ((paddedMatrix.block(i, j, wKernelWidth, wKernelHeight)).cwiseProduct(flippedKernel)) << std::endl << std::endl;
+				//std::cout << paddedMatrix.block(i, j, wKernelWidth, wKernelHeight) << std::endl;
+				//std::cout << ((paddedMatrix.block(i, j, wKernelWidth, wKernelHeight)).cwiseProduct(flippedKernel)) << std::endl << std::endl;
 				retMat(x, y++) = ((paddedMatrix.block(i, j, wKernelWidth, wKernelHeight)).cwiseProduct(flippedKernel)).sum();
 
 			}
@@ -84,4 +85,23 @@ Eigen::MatrixXd Layer::convolution(const Eigen::MatrixXd &matrix, const Eigen::M
 
 	return retMat;
 
+}
+
+void Layer::applyActivationFunction(Eigen::MatrixXd & iMatrix, const double & iTau)
+{
+
+	for (int i = 0; i < iMatrix.size(); ++i)
+	{
+		for (int j = 0; j < iMatrix.size(); ++j)
+		{
+			iMatrix(i, j) = 1 / (1 + exp(-iTau * iMatrix(i, j)));
+		}
+	}
+
+
+}
+
+int Layer::getOutPutSize()
+{
+	return mOutput.size();
 }

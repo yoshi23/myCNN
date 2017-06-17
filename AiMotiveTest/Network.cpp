@@ -56,7 +56,8 @@ void Network::initialize(const std::string & networkDescriptionFile, const int &
 				int wFilterHeight = std::get<1>(itPrescripedLayer->second);
 				int wNewLayerWidth = wPrevLayerWidth - std::get<2>(itPrescripedLayer->second) + 1;
 				int wNewLayerHeight = wPrevLayerHeight - std::get<1>(itPrescripedLayer->second) + 1;
-				ConvolutionalLayer * pNewLayer = new ConvolutionalLayer(wNewLayerWidth, wNewLayerHeight, wNumOfFilters, wFilterWidth, wFilterHeight);
+				int wNumOfInputFeatureMaps = mLayers.back()->getOutPutSize();
+				ConvolutionalLayer * pNewLayer = new ConvolutionalLayer(wNewLayerWidth, wNewLayerHeight, wNumOfInputFeatureMaps, wNumOfFilters, wFilterWidth, wFilterHeight);
 				mLayers.push_back(pNewLayer);
 
 				std::cout << "Convolutional layer added with size: " << wNewLayerWidth << "x" << wNewLayerHeight
@@ -91,16 +92,26 @@ void Network::initialize(const std::string & networkDescriptionFile, const int &
 	}
 }
 
-/*
-void run()
+
+void Network::run()
 {
-	it = mLayers.begin()
-		it->receiveInput(image...);
+	std::list<Layer*>::iterator it = mLayers.begin();
+	IoHandler wIoHandler;
 
-	while (it != mLayers.back())
+	IoHandler::rgbPixelMap inputImage = wIoHandler.loadImage("..\\images\\train52\\6\\6_0093.bmp");
+
+	if(dynamic_cast<InputLayer*>(*it) != NULL)
+		(*it)->acceptInput(inputImage);
+
+	Layer * wCurrentLayer = *it;
+	
+	while (++it != mLayers.end())
 	{
-		it->feedforward(++it);
+		Layer * wNextLayer = *it;
+		wCurrentLayer->feedForward(wNextLayer);
+		wCurrentLayer = *it;
 	}
-	it.provideOutput();
+	--it;
+	dynamic_cast<OutputLayer*>(*it)->provideOutput();
 
-}*/
+}

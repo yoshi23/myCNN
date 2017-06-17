@@ -16,11 +16,6 @@ public:
 
 
 	void acceptInput(const std::map<char, Eigen::MatrixXd>&);
-
-private:
-
-	IoHandler::rgbPixelMap mInputImage;
-
 	
 };
 

@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "OutputLayer.h"
 //#include "Dense"
+#include <iostream>
 #include <map>
 OutputLayer::OutputLayer()
 {
@@ -29,5 +30,10 @@ std::map<char, Eigen::MatrixXd> OutputLayer::backPropagate()
 
 void OutputLayer::acceptInput(const std::map<char, Eigen::MatrixXd>&)
 {
+}
+
+void OutputLayer::provideOutput()
+{
+	std::cout << "Network forward propagation has reached the end of the network! Hurray!\n";
 }
 

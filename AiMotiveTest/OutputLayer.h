@@ -12,6 +12,6 @@ public:
 	virtual void feedForward(Layer * pNextLayer);
 	virtual std::map<char, Eigen::MatrixXd> backPropagate();
 	void acceptInput(const std::map<char, Eigen::MatrixXd>&);
-
+	void provideOutput();
 };
 

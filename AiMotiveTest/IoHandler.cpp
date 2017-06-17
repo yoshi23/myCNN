@@ -8,6 +8,7 @@
 #include <cstdio>
 
 #include "Dense"
+#include "Layer.h"
 
 IoHandler::IoHandler()
 {
@@ -26,9 +27,9 @@ IoHandler::rgbPixelMap IoHandler::loadImage(const std::string & iFileName)
 
 	sf::Color pixel;
 
-	Eigen::MatrixXd retPixelsR(52, 52);
-	Eigen::MatrixXd retPixelsG(52, 52);
-	Eigen::MatrixXd retPixelsB(52, 52);
+	Eigen::MatrixXd retPixelsR(IMAGE_WIDTH, IMAGE_HEIGHT);
+	Eigen::MatrixXd retPixelsG(IMAGE_WIDTH, IMAGE_HEIGHT);
+	Eigen::MatrixXd retPixelsB(IMAGE_WIDTH, IMAGE_HEIGHT);
 
 	for (int i = 0; i < wImageFile.getSize().x; ++i) {
 		for (int j = 0; j < wImageFile.getSize().y; ++j) {
@@ -51,12 +52,12 @@ IoHandler::rgbPixelMap IoHandler::loadImage(const std::string & iFileName)
 
 void IoHandler::writePixelMapToFile(const IoHandler::rgbPixelMap & iImage){
 
-	FILE *fr = fopen("..\\images\\train52\\matrixOutputRedR.txt", "w");
-	FILE *fg = fopen("..\\images\\train52\\matrixOutputRedG.txt", "w");
-	FILE *fb = fopen("..\\images\\train52\\matrixOutputRedB.txt", "w");
+	FILE *fr = fopen("..\\images\\trainIMAGE_WIDTH\\matrixOutputRedR.txt", "w");
+	FILE *fg = fopen("..\\images\\trainIMAGE_WIDTH\\matrixOutputRedG.txt", "w");
+	FILE *fb = fopen("..\\images\\trainIMAGE_WIDTH\\matrixOutputRedB.txt", "w");
 	IoHandler::rgbPixelMap::const_iterator it = iImage.begin();
 	
-	for (int i = 0; i < 52; ++i) {
+	for (int i = 0; i < IMAGE_WIDTH; ++i) {
 		for (int j = 0; j < 51; ++j) {
 			fprintf(fr, "%d, ", static_cast<int>(iImage.at('r')(i, j))); 
 			fprintf(fg, "%d, ", static_cast<int>(iImage.at('g')(i, j)));
