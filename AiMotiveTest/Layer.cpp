@@ -90,9 +90,9 @@ Eigen::MatrixXd Layer::convolution(const Eigen::MatrixXd &matrix, const Eigen::M
 void Layer::applyActivationFunction(Eigen::MatrixXd & iMatrix, const double & iTau)
 {
 
-	for (int i = 0; i < iMatrix.size(); ++i)
+	for (int i = 0; i < iMatrix.rows(); ++i)
 	{
-		for (int j = 0; j < iMatrix.size(); ++j)
+		for (int j = 0; j < iMatrix.cols(); ++j)
 		{
 			iMatrix(i, j) = 1 / (1 + exp(-iTau * iMatrix(i, j)));
 		}

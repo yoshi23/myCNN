@@ -9,8 +9,8 @@ public:
 	PoolingLayer(const int & iSizeX, const int & iSizeY);
 	~PoolingLayer();
 
-	virtual void feedForward(Layer * pNextLayer);
-	virtual std::map<char, Eigen::MatrixXd> backPropagate();
-	void acceptInput(const std::map<char, Eigen::MatrixXd>&);
+	void feedForward(Layer * pNextLayer);
+	std::vector<Eigen::MatrixXd> backPropagate();
+	void acceptInput(const std::vector<Eigen::MatrixXd>&);
 };
 

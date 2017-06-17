@@ -9,7 +9,7 @@ ConvolutionalLayer::ConvolutionalLayer()
 {
 }
 
-ConvolutionalLayer::ConvolutionalLayer(const int & iWidth, const int & iHeight, const int & wNumOfInputFeatureMaps, const int & iNumOfKernels, const int & iFilterWidth, const int & iFilterHeight)
+ConvolutionalLayer::ConvolutionalLayer(const int & iWidth, const int & iHeight, const int & wNumOfInputFeatureMaps, const int & iNumOfKernels, const int & iKernelWidth, const int & iKernelHeight)
 {
 	mSizeX = iHeight;
 	mSizeY = iWidth;
@@ -21,10 +21,12 @@ ConvolutionalLayer::ConvolutionalLayer(const int & iWidth, const int & iHeight, 
 		std::cout << std::endl << "hello: " << newKernel.size() << std::endl;
 		for (int j = 0; j < wNumOfInputFeatureMaps; ++j)
 		{
-			newKernel[j] = Eigen::MatrixXd::Random(iFilterWidth, iFilterHeight);
+			newKernel[j] = Eigen::MatrixXd::Random(iKernelWidth, iKernelHeight);
 		}
 		mKernels.push_back(newKernel);
-		mOutput.insert(std::make_pair(i, Eigen::MatrixXd::Random(IMAGE_HEIGHT, IMAGE_WIDTH)));
+		mBias.push_back(Eigen::MatrixXd::Random(mSizeX, mSizeY));
+
+		mOutput.push_back(Eigen::MatrixXd::Random(IMAGE_HEIGHT, IMAGE_WIDTH));
 	}
 }
 
@@ -46,16 +48,16 @@ void ConvolutionalLayer::convolve()
 	std::vector<Kernel >::iterator itKernel = mKernels.begin();
 	for (int i= 0; i<mKernels.size(); ++i)//; itKernel != mKernels.end(); ++itKernel)
 	{
-		Eigen::MatrixXd wNewFeatureMap = convolution(mInput[0], mKernels[i][0], Layer::Valid); //First convolvation is taken out here
-		//so we do not have to worry about the size of wNewFeatureMap, but set automatically by the returning value.
-		std::cout << "\n\n" << wNewFeatureMap.rows() << "x" << wNewFeatureMap.cols() << std::endl;
-		for (int j = 1; j < mKernels.size(); ++j)
+		Eigen::MatrixXd wNewFeatureMap = Eigen::MatrixXd::Zero(mSizeX, mSizeY); 
+		std::cout << "\n\nbobemobe: " << wNewFeatureMap.rows() << "x" << wNewFeatureMap.cols() << std::endl;
+		for (int j = 0; j < mInput.size(); ++j)
 		{
 			wNewFeatureMap += convolution(mInput[j], mKernels[i][j], Layer::Valid);
+			std::cout << "one convolution is done\n" << mKernels[i].size() << std::endl;
 		}
 		wNewFeatureMap -= mBias[i];
 		applyActivationFunction(wNewFeatureMap, 1);
-		mOutput.insert(std::make_pair(mOutput.size()+1, wNewFeatureMap));
+		mOutput[i] = (wNewFeatureMap);
 	}
 
 	
@@ -69,14 +71,14 @@ void ConvolutionalLayer::feedForward(Layer * pNextLayer)
 	pNextLayer->acceptInput(mOutput);
 }
 
-std::map<char, Eigen::MatrixXd> ConvolutionalLayer::backPropagate()
+std::vector<Eigen::MatrixXd> ConvolutionalLayer::backPropagate()
 {//MOCK
-	std::map<char, Eigen::MatrixXd> fake;
+	std::vector< Eigen::MatrixXd> fake;
 	return fake;
 }
 
 
-void ConvolutionalLayer::acceptInput(const std::map<char, Eigen::MatrixXd>& iInputMap)
+void ConvolutionalLayer::acceptInput(const std::vector<Eigen::MatrixXd>& iInputMap)
 {
 	mInput = iInputMap;
 }

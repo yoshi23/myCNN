@@ -51,17 +51,17 @@ void Network::initialize(const std::string & networkDescriptionFile, const int &
 				//Size of network is calculated from the kernel sizes:
 				int wPrevLayerWidth = mLayers.back()->getSizeY();
 				int wPrevLayerHeight = mLayers.back()->getSizeX();
-				int wNumOfFilters = std::get<0>(itPrescripedLayer->second);
-				int wFilterWidth = std::get<2>(itPrescripedLayer->second);
-				int wFilterHeight = std::get<1>(itPrescripedLayer->second);
+				int wNumOfKernels = std::get<0>(itPrescripedLayer->second);
+				int wKernelWidth = std::get<2>(itPrescripedLayer->second);
+				int wKernelHeight = std::get<1>(itPrescripedLayer->second);
 				int wNewLayerWidth = wPrevLayerWidth - std::get<2>(itPrescripedLayer->second) + 1;
 				int wNewLayerHeight = wPrevLayerHeight - std::get<1>(itPrescripedLayer->second) + 1;
 				int wNumOfInputFeatureMaps = mLayers.back()->getOutPutSize();
-				ConvolutionalLayer * pNewLayer = new ConvolutionalLayer(wNewLayerWidth, wNewLayerHeight, wNumOfInputFeatureMaps, wNumOfFilters, wFilterWidth, wFilterHeight);
+				ConvolutionalLayer * pNewLayer = new ConvolutionalLayer(wNewLayerWidth, wNewLayerHeight, wNumOfInputFeatureMaps, wNumOfKernels, wKernelWidth, wKernelHeight);
 				mLayers.push_back(pNewLayer);
 
 				std::cout << "Convolutional layer added with size: " << wNewLayerWidth << "x" << wNewLayerHeight
-					<< "\n\t\twith " << wNumOfFilters << " filters of size: " << wFilterWidth << "x" << wFilterHeight
+					<< "\n\t\twith " << wNumOfKernels << " Kernels of size: " << wKernelWidth << "x" << wKernelHeight
 					<< "; as the " << mLayers.size() - 1 << "th layer.\n";
 
 				break;

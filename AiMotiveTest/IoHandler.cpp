@@ -42,9 +42,9 @@ IoHandler::rgbPixelMap IoHandler::loadImage(const std::string & iFileName)
 	}
 
 	rgbPixelMap retMap;
-	retMap.insert(std::make_pair('r', retPixelsR));
-	retMap.insert(std::make_pair('g', retPixelsG));
-	retMap.insert(std::make_pair('b', retPixelsB));
+	retMap.push_back(retPixelsR);
+	retMap.push_back(retPixelsG);
+	retMap.push_back(retPixelsB);
 
 	return retMap;
 }
@@ -58,16 +58,16 @@ void IoHandler::writePixelMapToFile(const IoHandler::rgbPixelMap & iImage){
 	IoHandler::rgbPixelMap::const_iterator it = iImage.begin();
 	
 	for (int i = 0; i < IMAGE_WIDTH; ++i) {
-		for (int j = 0; j < 51; ++j) {
-			fprintf(fr, "%d, ", static_cast<int>(iImage.at('r')(i, j))); 
-			fprintf(fg, "%d, ", static_cast<int>(iImage.at('g')(i, j)));
-			fprintf(fb, "%d, ", static_cast<int>(iImage.at('b')(i, j)));
+		for (int j = 0; j < IMAGE_HEIGHT - 1; ++j) {
+			fprintf(fr, "%d, ", static_cast<int>(iImage[0](i, j))); 
+			fprintf(fg, "%d, ", static_cast<int>(iImage[1](i, j)));
+			fprintf(fb, "%d, ", static_cast<int>(iImage[2](i, j)));
 			--it;
 			--it;
 		}
-		fprintf(fr, "%d ", iImage.at('r')(i, 51));
-		fprintf(fg, "%d ", iImage.at('g')(i, 51));
-		fprintf(fb, "%d ", iImage.at('b')(i, 51));
+		fprintf(fr, "%d ", iImage[0](i, 51));
+		fprintf(fg, "%d ", iImage[1](i, 51));
+		fprintf(fb, "%d ", iImage[2](i, 51));
 		--it;
 		--it;
 		fprintf(fr, "\n");

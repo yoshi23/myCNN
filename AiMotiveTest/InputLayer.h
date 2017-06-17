@@ -12,10 +12,10 @@ public:
 	~InputLayer();
 	InputLayer(const int & iSizeX, const int & iSizeY);
 	void feedForward(Layer * pNextLayer);
-	std::map<char, Eigen::MatrixXd> backPropagate();
+	std::vector<Eigen::MatrixXd> backPropagate();
 
 
-	void acceptInput(const std::map<char, Eigen::MatrixXd>&);
+	void acceptInput(const std::vector<Eigen::MatrixXd>&);
 	
 };
 

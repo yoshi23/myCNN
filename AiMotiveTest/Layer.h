@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Dense"
-#include <map>
+#include <vector>
 
 #define IMAGE_WIDTH 52
 #define IMAGE_HEIGHT 52
@@ -22,8 +22,8 @@ public:
 	virtual ~Layer();
 
 	virtual void feedForward(Layer * pNextLayer) = 0;
-	virtual std::map<char, Eigen::MatrixXd> backPropagate() = 0;
-	virtual void acceptInput(const std::map<char, Eigen::MatrixXd>&) = 0;
+	virtual std::vector<Eigen::MatrixXd> backPropagate() = 0;
+	virtual void acceptInput(const std::vector<Eigen::MatrixXd>&) = 0;
 
 	int getSizeX();
 	int getSizeY();
@@ -41,8 +41,8 @@ protected:
 	int mSizeX;
 	int mSizeY;
 
-	std::map<char, Eigen::MatrixXd> mInput;
-	std::map<char, Eigen::MatrixXd> mOutput;
+	std::vector<Eigen::MatrixXd> mInput;
+	std::vector<Eigen::MatrixXd> mOutput;
 	//Eigen::MatrixXd mNeurons;
 
 

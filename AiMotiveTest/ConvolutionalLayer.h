@@ -12,19 +12,19 @@ public:
 		const int & iHeight, 
 		const int & wNumOfInputFeatureMaps, 
 		const int & iNumOfLayers, 
-		const int & iFilterWidth, 
-		const int & iFilterHeight);
+		const int & iKernelWidth, 
+		const int & iKernelHeight);
 	~ConvolutionalLayer();
 
 	void convolve();
 
 	virtual void feedForward(Layer * pNextLayer);
-	virtual std::map<char, Eigen::MatrixXd> backPropagate();
-	void acceptInput(const std::map<char, Eigen::MatrixXd>&);
+	virtual std::vector<Eigen::MatrixXd> backPropagate();
+	void acceptInput(const std::vector<Eigen::MatrixXd>&);
 
 private:
 
-	typedef std::vector<Eigen::MatrixXd> Kernel; //these will comprise the depth of a kernel/filter
+	typedef std::vector<Eigen::MatrixXd> Kernel; //these will comprise the depth of a kernel/Kernel
 	std::vector<Kernel > mKernels;
 	std::vector<Eigen::MatrixXd> mBias;
 

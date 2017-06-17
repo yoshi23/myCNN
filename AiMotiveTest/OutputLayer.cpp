@@ -3,6 +3,7 @@
 //#include "Dense"
 #include <iostream>
 #include <map>
+#include <vector>
 OutputLayer::OutputLayer()
 {
 }
@@ -22,13 +23,13 @@ void OutputLayer::feedForward(Layer * pNextLayer)
 {//mock
 }
 
-std::map<char, Eigen::MatrixXd> OutputLayer::backPropagate()
+std::vector< Eigen::MatrixXd> OutputLayer::backPropagate()
 {//mock
-	std::map<char, Eigen::MatrixXd> fake;
+	std::vector< Eigen::MatrixXd> fake;
 	return fake;
 }
 
-void OutputLayer::acceptInput(const std::map<char, Eigen::MatrixXd>&)
+void OutputLayer::acceptInput(const std::vector<Eigen::MatrixXd>&)
 {
 }
 

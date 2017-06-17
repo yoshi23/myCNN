@@ -18,7 +18,7 @@ struct NetworkDescriptor
 
 	void readDescription(const std::string & iFileName);
 
-	typedef std::pair<LayerTypes, std::tuple<int, int, int> > typeAndSize; //For each layer gives the <Type, <num of Filters, Size> >.
+	typedef std::pair<LayerTypes, std::tuple<int, int, int> > typeAndSize; //For each layer gives the <Type, <num of Kernels, Size> >.
 	std::vector<typeAndSize> mStructure; //Stores the order and typeAndSize information provided. 
 };
 

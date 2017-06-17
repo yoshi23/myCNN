@@ -26,7 +26,7 @@ void NetworkDescriptor::readDescription(const std::string & iFileName)
 
 	std::string layerType;
 	int ord = 0, m = 0, n = 0;
-	int numOfFilters = 0;
+	int numOfKernels = 0;
 
 	if (configFile.is_open())
 	{
@@ -44,7 +44,7 @@ void NetworkDescriptor::readDescription(const std::string & iFileName)
 					case 'c':
 					{
 						newLayer.first = LayerTypes::Convolutional;
-						sst >> numOfFilters;
+						sst >> numOfKernels;
 						sst >> separationSymbols;
 						break;
 					}
@@ -61,7 +61,7 @@ void NetworkDescriptor::readDescription(const std::string & iFileName)
 					sst >> n;	
 					if (newLayer.first == Convolutional)
 					{
-						newLayer.second = std::tuple<int, int, int>(numOfFilters, m, n);
+						newLayer.second = std::tuple<int, int, int>(numOfKernels, m, n);
 					}
 					else
 					{

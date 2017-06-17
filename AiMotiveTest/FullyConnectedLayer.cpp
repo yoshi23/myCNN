@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "FullyConnectedLayer.h"
 #include <map>
+#include <vector>
 #include "Dense"
 FullyConnectedLayer::FullyConnectedLayer()
 {
@@ -19,14 +20,13 @@ FullyConnectedLayer::~FullyConnectedLayer()
 
 void FullyConnectedLayer::feedForward(Layer * pNextLayer)
 {//mock
-	std::map<char, Eigen::MatrixXd> fake;
-	//return fake;
+
 }
 
-std::map<char, Eigen::MatrixXd> FullyConnectedLayer::backPropagate()
+std::vector<Eigen::MatrixXd> FullyConnectedLayer::backPropagate()
 {//mock
-	std::map<char, Eigen::MatrixXd> fake;
+	std::vector<Eigen::MatrixXd> fake;
 	return fake;
 }
 
-void FullyConnectedLayer::acceptInput(const std::map<char, Eigen::MatrixXd>&) {}
+void FullyConnectedLayer::acceptInput(const std::vector<Eigen::MatrixXd>&) {}

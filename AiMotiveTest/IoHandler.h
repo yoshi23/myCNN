@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include <map>
+#include <vector>
 #include "Dense"
 class IoHandler
 {
@@ -8,7 +8,7 @@ public:
 	IoHandler();
 	virtual ~IoHandler();
 
-	typedef std::map<char, Eigen::MatrixXd> rgbPixelMap;
+	typedef std::vector<Eigen::MatrixXd> rgbPixelMap;
 	rgbPixelMap loadImage(const std::string & iFileName);
 	void writePixelMapToFile(const IoHandler::rgbPixelMap & iImage);
 
