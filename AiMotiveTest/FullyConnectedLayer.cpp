@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "FullyConnectedLayer.h"
-#include <map>
 #include <vector>
 #include "Dense"
 
@@ -85,6 +84,21 @@ void FullyConnectedLayer::acceptInput(const std::vector<Eigen::MatrixXd>& iInput
 void FullyConnectedLayer::acceptErrorOfPrevLayer(const std::vector<Eigen::MatrixXd>& ideltaErrorOfPrevLayer)
 {
 	mDeltaErrorOfPrevLayer = ideltaErrorOfPrevLayer;
+}
+
+int FullyConnectedLayer::getDepth()
+{
+	return mWeights[0].size();
+}
+
+Eigen::MatrixXd FullyConnectedLayer::getWeights(const int & neuron, const int & depth)
+{
+	return mWeights[neuron][depth];
+}
+
+double FullyConnectedLayer::getBiases(const int & neuron)
+{
+	return mBiases[neuron];
 }
 
 

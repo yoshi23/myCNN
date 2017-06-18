@@ -16,6 +16,9 @@ public:
 
 	void acceptErrorOfPrevLayer(const std::vector<Eigen::MatrixXd>& ideltaErrorOfPrevLayer);
 	
+	int getDepth();
+	Eigen::MatrixXd getWeights(const int & neuron, const int & depth);
+	double	getBiases(const int& neuron);
 
 protected:
 	void calculateActivation();

@@ -144,7 +144,7 @@
     <ClInclude Include="ConvolutionalLayer.h" />
     <ClInclude Include="FullyConnectedLayer.h" />
     <ClInclude Include="InputLayer.h" />
-    <ClInclude Include="IoHandler.h" />
+    <ClInclude Include="IoHandling.h" />
     <ClInclude Include="Layer.h" />
     <ClInclude Include="Network.h" />
     <ClInclude Include="NetworkDescriptor.h" />
@@ -158,7 +158,7 @@
     <ClCompile Include="ConvolutionalLayer.cpp" />
     <ClCompile Include="FullyConnectedLayer.cpp" />
     <ClCompile Include="InputLayer.cpp" />
-    <ClCompile Include="IoHandler.cpp" />
+    <ClCompile Include="IoHandling.cpp" />
     <ClCompile Include="Layer.cpp" />
     <ClCompile Include="Network.cpp" />
     <ClCompile Include="NetworkDescriptor.cpp" />

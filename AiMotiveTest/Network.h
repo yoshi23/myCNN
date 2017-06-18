@@ -19,13 +19,14 @@ public:
 
 	bool isLearning();
 
-	void initialize(const std::string & iNetworkDescriptionFile, const int & inputSizeX, const int & intputSizeY);
+	void initialize(const int & iConfiguration);
 	int run(const std::string & iDirectory, const int & dirNum);
 
 private:
 
 	std::list<Layer*> mLayers;
 
+	int mConfiguration;
 	RunningMode mRunningMode;
 
 };

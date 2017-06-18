@@ -1,8 +1,7 @@
 #pragma once
 #include "Layer.h"
 #include "Dense"
-#include "IoHandler.h"
-#include <map>
+
 
 class InputLayer :
 	public Layer

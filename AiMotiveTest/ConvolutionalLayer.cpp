@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "ConvolutionalLayer.h"
+#include "IoHandling.h"
 #include <algorithm>
 #include <vector>
-#include <map>
 #include <iostream>
 
 ConvolutionalLayer::ConvolutionalLayer()
