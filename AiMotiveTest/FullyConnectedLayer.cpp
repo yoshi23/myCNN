@@ -3,6 +3,9 @@
 #include <map>
 #include <vector>
 #include "Dense"
+
+#include <iostream>
+
 FullyConnectedLayer::FullyConnectedLayer()
 {
 }
@@ -12,18 +15,22 @@ FullyConnectedLayer::FullyConnectedLayer(const int & iSizeX, const int & iNumOfI
 	mSizeY = 1;
 
 	mWeights.resize(mSizeX);
+	mBiases.resize(mSizeX);
 	for (int i = 0; i < mWeights.size(); ++i)
 	{
 		Weights newWeights(iNumOfInputFeatureMaps);
+		Eigen::MatrixXd newBiases = Eigen::MatrixXd::Random(iNumOfInputFeatureMaps,1);
 		for (int j = 0; j < iNumOfInputFeatureMaps; ++j)
 		{
 			newWeights[j] = Eigen::MatrixXd::Random(iSizeOfPrevLayerX, iSizeOfPrevLayerY);
 		}
 		mWeights[i] = newWeights;
+		mBiases[i] = newBiases;
 	}
 
 	mOutput.resize(0);
 	mOutput.push_back(Eigen::MatrixXd::Zero(iSizeX, 1));
+
 }
 
 
@@ -57,8 +64,7 @@ void FullyConnectedLayer::calculateActivation()
 		for (int j = 0; j < mInput.size(); ++j)
 		{
 			double result(0);
-			//convolution(mInput[j], mWeights[i][j], Layer::Valid);
-			result = (mInput[j].cwiseProduct(mWeights[i][j])).sum();
+			result = (mInput[j].cwiseProduct(mWeights[i][j])).sum() - mBiases[i](j,0);
 			sigmoid(result, 1);
 			mOutput[0](i, 0) = result;
 		}

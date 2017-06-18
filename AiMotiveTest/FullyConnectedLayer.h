@@ -18,11 +18,10 @@ public:
 protected:
 	void calculateActivation();
 private:
-	
-	//TODO: SHOULD HAVE A COMMON PARENT CLASS WITH CONVOLUTIONAL LAYER!
+	//TODO: COULD HAVE A COMMON PARENT CLASS WITH CONVOLUTIONAL LAYER!
 	typedef std::vector<Eigen::MatrixXd> Weights; //these will comprise the depth of a kernel/Kernel
 	std::vector<Weights > mWeights;
-	std::vector<Eigen::MatrixXd> mBias;
+	std::vector<Eigen::MatrixXd> mBiases;
 
 };
 

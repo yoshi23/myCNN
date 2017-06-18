@@ -10,9 +10,6 @@ public:
 	~OutputLayer();
 
 	void feedForward();
-	//virtual void feedForward(Layer * pNextLayer);
-	//virtual std::vector< Eigen::MatrixXd> backPropagate();
-	//void acceptInput(const std::vector<Eigen::MatrixXd>&);
 	void provideOutput();
 };
 

@@ -18,7 +18,6 @@ ConvolutionalLayer::ConvolutionalLayer(const int & iWidth, const int & iHeight, 
 	{
 		Kernel newKernel;
 		newKernel.resize(wNumOfInputFeatureMaps);
-		std::cout << std::endl << "hello: " << newKernel.size() << std::endl;
 		for (int j = 0; j < wNumOfInputFeatureMaps; ++j)
 		{
 			newKernel[j] = Eigen::MatrixXd::Random(iKernelWidth, iKernelHeight);
@@ -37,23 +36,14 @@ ConvolutionalLayer::~ConvolutionalLayer()
 
 void ConvolutionalLayer::convolve()
 {
-	/*for_each(mKernels.begin(), mKernels.end(), [this](Eigen::MatrixXd & iKernel)
-		{
-			for_each(iKernel.begin(), iKernel.end())
-		Eigen::MatrixXd wNewOutput = convolution(mInput, iKernel, Layer::Valid);
-		}
-	);*/
-		
-	
+
 	std::vector<Kernel >::iterator itKernel = mKernels.begin();
-	for (int i= 0; i<mKernels.size(); ++i)//; itKernel != mKernels.end(); ++itKernel)
+	for (int i= 0; i<mKernels.size(); ++i)
 	{
 		Eigen::MatrixXd wNewFeatureMap = Eigen::MatrixXd::Zero(mSizeX, mSizeY); 
-		std::cout << "\n\nbobemobe: " << wNewFeatureMap.rows() << "x" << wNewFeatureMap.cols() << std::endl;
 		for (int j = 0; j < mInput.size(); ++j)
 		{
 			wNewFeatureMap += convolution(mInput[j], mKernels[i][j], Layer::Valid);
-			std::cout << "one convolution is done\n" << mKernels[i].size() << std::endl;
 		}
 		wNewFeatureMap -= mBias[i];
 		applyActivationFunction(wNewFeatureMap, 1);

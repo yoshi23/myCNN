@@ -53,10 +53,6 @@ void PoolingLayer::downSample()
 {
 	for (int i = 0; i < mInput.size(); ++i)
 	{
-	//	int regionX = (mInput[i].cols()/mOutput[i].cols()); //we are dividing ints, so no need to floor().
-	//	int regionY = (mInput[i].rows()/mOutput[i].rows());
-
-
 			switch(mMethod)
 			{
 				case Max:
@@ -77,22 +73,17 @@ void PoolingLayer::downSample()
 								Eigen::MatrixXd paddedMatrix = Eigen::MatrixXd::Zero(mInput[i].rows() + remainderX, mInput[i].cols() + remainderY);
 								paddedMatrix.block(0,0, mInput[i].rows(), mInput[i].cols()) = mInput[i];
 								mInput[i] = paddedMatrix;
-							} 							
+							} 		
+							poolingRegionX = mInput[i].cols() / mSizeX;
+							poolingRegionY = mInput[i].rows() / mSizeY;
 
 							mOutput[i](x, y) = mInput[i].block(poolingRegionY*y, poolingRegionX*x, poolingRegionY, poolingRegionX).maxCoeff();
-							//std::cout << mOutput[i](x, y) << ", ";
 						}
-						std::cout << std::endl;
 					}
-					if ((double)mInput[i].cols() / mOutput[i].cols() != 0)
-					{
-
-					}
-
 					break;
 				}
 				case Average:
-				{
+				{//MOCK
 					break;
 				}
 				default:

@@ -14,7 +14,6 @@ public:
 	void feedForward(Layer * pNextLayer);
 	std::vector<Eigen::MatrixXd> backPropagate();
 
-
 	void acceptInput(const std::vector<Eigen::MatrixXd>&);
 	
 };

@@ -17,7 +17,6 @@ public:
 		Valid
 	};
 
-
 	Layer();
 	virtual ~Layer();
 
@@ -34,17 +33,13 @@ public:
 	void applyActivationFunction(Eigen::MatrixXd &matrix, const double & iTau);
 	void sigmoid(double & iVal, const double & iTau);
 
-
 protected:
 
-	
 	int mSizeX;
 	int mSizeY;
 
 	std::vector<Eigen::MatrixXd> mInput;
 	std::vector<Eigen::MatrixXd> mOutput;
-	//Eigen::MatrixXd mNeurons;
-
 
 };
 
