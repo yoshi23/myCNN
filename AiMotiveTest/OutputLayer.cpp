@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "OutputLayer.h"
 #include <iostream>
-#include <map>
+#include "IoHandling.h"
 #include <vector>
 
 OutputLayer::OutputLayer()
@@ -108,4 +108,10 @@ void OutputLayer::calcDeltaOfLayer()
 void OutputLayer::acceptErrorOfPrevLayer(const std::vector<Eigen::MatrixXd>& ideltaErrorOfPrevLayer)
 {
 	mDeltaErrorOfPrevLayer = ideltaErrorOfPrevLayer;
+}
+
+
+double OutputLayer::getOutputError()
+{
+	return mError;
 }

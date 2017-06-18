@@ -3,8 +3,7 @@
 #include "Dense"
 #include <vector>
 
-#define IMAGE_WIDTH 52
-#define IMAGE_HEIGHT 52
+
 
 class Layer
 {
@@ -51,7 +50,7 @@ protected:
 	std::vector<Eigen::MatrixXd> mDeltaErrorOfPrevLayer;
 
 	
-	const double ETA = -0.4;
+	const double ETA = -0.1;
 	const double epsilon = 0.01; //for calculating activation gradients
 };
 

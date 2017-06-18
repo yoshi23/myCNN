@@ -80,9 +80,11 @@ void NetworkDescriptor::readDescription(const std::string & iFileName)
 			}
 				
 		}
+		configFile.close();
 	}
 	else
 	{
 		std::cout << "Opening config file failed!\n";
 	}
+
 }

@@ -8,17 +8,21 @@
 #include "PoolingLayer.h"
 #include "FullyConnectedLayer.h"
 #include "OutputLayer.h"
-
-#include <iostream>
+#include "IoHandling.h"
 
 #include <algorithm>
 #include <string>
 #include <sstream>
 #include <iomanip>
+#include <iostream>
+
+#include <cstdlib>
+#include <time.h>
 
 Network::Network()
 {
 	mRunningMode = Learning; // Working;
+	mConfiguration = 1;
 }
 
 
@@ -37,15 +41,20 @@ bool Network::isLearning()
 	else return false;
 }
 
-void Network::initialize(const std::string & iNetworkDescriptionFile, const int & iInputSizeX, const int & iInputSizeY)
+void Network::initialize(const int & iConfiguration)
 {
-	mLayers.resize(0);
-	InputLayer * pInputLayer = new InputLayer(iInputSizeX, iInputSizeY);
+	std::srand((unsigned int)time(0));
+	mConfiguration = iConfiguration;
+
+
+	mLayers.resize(0); 
+	InputLayer * pInputLayer = new InputLayer(IMAGE_HEIGHT, IMAGE_WIDTH);
 	mLayers.push_back(pInputLayer);
 	std::cout << "Input layer added with size: " << pInputLayer->getSizeX() << "x" << pInputLayer->getSizeY() << " as the 0th layer.\n";
 
-
 	NetworkDescriptor wNetworkDescriptor;
+	std::string iNetworkDescriptionFile = "..\\NetworkDescription" + std::to_string(iConfiguration) + ".config";
+	std::cout << iNetworkDescriptionFile << std::endl;
 	wNetworkDescriptor.readDescription(iNetworkDescriptionFile);
 
 	std::vector<NetworkDescriptor::typeAndSize>::iterator itPrescripedLayer = wNetworkDescriptor.mStructure.begin();
@@ -111,15 +120,12 @@ void Network::initialize(const std::string & iNetworkDescriptionFile, const int 
 
 int Network::run(const std::string & iDirectory, const int & dirNum)
 {
-	std::cout << "dirnum: " << dirNum << std::endl;
-
 	std::list<Layer*>::iterator it = mLayers.begin();
-	IoHandler wIoHandler;
 
 	Eigen::MatrixXd wExpectedOutput = Eigen::MatrixXd::Zero(mLayers.back()->getSizeX(), 1);
 	wExpectedOutput(dirNum - 1, 0) = 1;
 
-	std::cout << "\nExpected output: " << wExpectedOutput << "\n\n\n";
+	//std::cout << "\nExpected output: " << wExpectedOutput << "\n\n\n";
 
 	for (int imCount = 0; imCount < 1000; ++imCount)
 	{
@@ -129,7 +135,7 @@ int Network::run(const std::string & iDirectory, const int & dirNum)
 		std::string ordNum;
 		sst >> ordNum;
 		std::string imName = iDirectory + ordNum + ".bmp";
-		IoHandler::rgbPixelMap inputImage = wIoHandler.loadImage(imName);
+		IoHandling::rgbPixelMap inputImage = IoHandling::loadImage(imName);
 		//std::cout << "\nfile name to open: " << imName << std::endl << std::endl;
 		if (dynamic_cast<InputLayer*>(*it) != NULL)
 			(*it)->acceptInput(inputImage);
@@ -149,6 +155,12 @@ int Network::run(const std::string & iDirectory, const int & dirNum)
 		}
 		--it;
 		dynamic_cast<OutputLayer*>(*it)->feedForward(wExpectedOutput);
+
+		if (dynamic_cast<OutputLayer*>(*it)->getOutputError() < 10.05)
+		{
+				IoHandling::saveWeightsAndBiases(mLayers, mConfiguration);
+		}
+
 
 
 		//If learning is switched on then we will backgpropagate the error
