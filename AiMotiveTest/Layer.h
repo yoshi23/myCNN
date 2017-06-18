@@ -32,7 +32,7 @@ public:
 	Eigen::MatrixXd convolution(const Eigen::MatrixXd &matrix, const Eigen::MatrixXd &kernel, const Layer::ConvolTypes & iType);
 
 	void applyActivationFunction(Eigen::MatrixXd &matrix, const double & iTau);
-
+	void sigmoid(double & iVal, const double & iTau);
 
 
 protected:

@@ -80,7 +80,7 @@ void PoolingLayer::downSample()
 							} 							
 
 							mOutput[i](x, y) = mInput[i].block(poolingRegionY*y, poolingRegionX*x, poolingRegionY, poolingRegionX).maxCoeff();
-							std::cout << mOutput[i](x, y) << ", ";
+							//std::cout << mOutput[i](x, y) << ", ";
 						}
 						std::cout << std::endl;
 					}

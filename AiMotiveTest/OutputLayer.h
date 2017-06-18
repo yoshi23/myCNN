@@ -1,17 +1,18 @@
 #pragma once
-#include "Layer.h"
+#include "FullyConnectedLayer.h"
 
 class OutputLayer :
-	public Layer
+	public FullyConnectedLayer
 {
 public:
 	OutputLayer();
-	OutputLayer(const int & iSizeX, const int & iSizeY);
+	OutputLayer(const int & iSizeX, const int & iNumOfInputFeatureMaps, const int & iSizeOfPrevLayerX, const int & iSizeOfPrevLayerY);
 	~OutputLayer();
 
-	virtual void feedForward(Layer * pNextLayer);
-	virtual std::vector< Eigen::MatrixXd> backPropagate();
-	void acceptInput(const std::vector<Eigen::MatrixXd>&);
+	void feedForward();
+	//virtual void feedForward(Layer * pNextLayer);
+	//virtual std::vector< Eigen::MatrixXd> backPropagate();
+	//void acceptInput(const std::vector<Eigen::MatrixXd>&);
 	void provideOutput();
 };
 

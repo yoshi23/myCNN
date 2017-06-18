@@ -43,7 +43,10 @@ void Network::initialize(const std::string & networkDescriptionFile, const int &
 
 	for (; itPrescripedLayer != wNetworkDescriptor.mStructure.end(); ++itPrescripedLayer)
 	{
-		
+		int wNumOfInputFeatureMaps = mLayers.back()->getOutPutSize();
+		int wSizeOfPrevLayerX = mLayers.back()->getSizeX();
+		int wSizeOfPrevLayerY = mLayers.back()->getSizeY();
+
 		switch (itPrescripedLayer->first)
 		{
 			case NetworkDescriptor::Convolutional:
@@ -56,7 +59,6 @@ void Network::initialize(const std::string & networkDescriptionFile, const int &
 				int wKernelHeight = std::get<1>(itPrescripedLayer->second);
 				int wNewLayerWidth = wPrevLayerWidth - std::get<2>(itPrescripedLayer->second) + 1;
 				int wNewLayerHeight = wPrevLayerHeight - std::get<1>(itPrescripedLayer->second) + 1;
-				int wNumOfInputFeatureMaps = mLayers.back()->getOutPutSize();
 				ConvolutionalLayer * pNewLayer = new ConvolutionalLayer(wNewLayerWidth, wNewLayerHeight, wNumOfInputFeatureMaps, wNumOfKernels, wKernelWidth, wKernelHeight);
 				mLayers.push_back(pNewLayer);
 
@@ -68,9 +70,7 @@ void Network::initialize(const std::string & networkDescriptionFile, const int &
 			}
 			case NetworkDescriptor::Pooling:
 			{
-				int wNumOfInputFeatureMaps = mLayers.back()->getOutPutSize();
-				int wSizeOfPrevLayerX = mLayers.back()->getSizeX();
-				int wSizeOfPrevLayerY = mLayers.back()->getSizeY();
+
 				PoolingLayer * pNewLayer = new PoolingLayer(std::get<1>(itPrescripedLayer->second), std::get<2>(itPrescripedLayer->second), PoolingLayer::Max, wNumOfInputFeatureMaps, wSizeOfPrevLayerX, wSizeOfPrevLayerY); //This could be easily set to be dynamicly read from config file.
 				mLayers.push_back(pNewLayer);
 				std::cout << "Pooling layer added with size: " << pNewLayer->getSizeX() << "x" << pNewLayer->getSizeY() << " as the " << mLayers.size()-1 << "th layer.\n";
@@ -78,14 +78,14 @@ void Network::initialize(const std::string & networkDescriptionFile, const int &
 			}
 			case NetworkDescriptor::FullyConnected:
 			{
-				FullyConnectedLayer * pNewLayer = new FullyConnectedLayer(std::get<1>(itPrescripedLayer->second), std::get<2>(itPrescripedLayer->second));
+				FullyConnectedLayer * pNewLayer = new FullyConnectedLayer(std::get<1>(itPrescripedLayer->second), wNumOfInputFeatureMaps, wSizeOfPrevLayerX, wSizeOfPrevLayerY);
 				mLayers.push_back(pNewLayer);
 				std::cout << "FullyConnected layer added with size: " << pNewLayer->getSizeX() << "x" << pNewLayer->getSizeY() << " as the " << mLayers.size() - 1 << "th layer.\n";
 				break;
 			}	
 			case NetworkDescriptor::Output:
 			{
-				OutputLayer * pNewLayer = new OutputLayer(std::get<1>(itPrescripedLayer->second), std::get<2>(itPrescripedLayer->second));
+				OutputLayer * pNewLayer = new OutputLayer(std::get<1>(itPrescripedLayer->second), wNumOfInputFeatureMaps, wSizeOfPrevLayerX, wSizeOfPrevLayerY);
 				mLayers.push_back(pNewLayer);
 				std::cout << "Output layer added with size: " << pNewLayer->getSizeX() << "x" << pNewLayer->getSizeY() << " as the " << mLayers.size() - 1 << "th, last layer.\n";
 				break;
@@ -119,6 +119,6 @@ void Network::run()
 		wCurrentLayer = *it;
 	}
 	--it;
-	dynamic_cast<OutputLayer*>(*it)->provideOutput();
+	dynamic_cast<OutputLayer*>(*it)->feedForward();
 
 }

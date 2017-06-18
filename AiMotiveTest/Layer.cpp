@@ -94,12 +94,18 @@ void Layer::applyActivationFunction(Eigen::MatrixXd & iMatrix, const double & iT
 	{
 		for (int j = 0; j < iMatrix.cols(); ++j)
 		{
-			iMatrix(i, j) = 1 / (1 + exp(-iTau * iMatrix(i, j)));
+			sigmoid(iMatrix(i, j), iTau);
+			//iMatrix(i, j) = 1 / (1 + exp(-iTau * iMatrix(i, j)));
 		}
 	}
-
-
 }
+
+void Layer::sigmoid(double & iVal, const double & iTau)
+{
+	iVal = 1 / (1 + exp(-iTau * iVal));
+}
+
+
 
 int Layer::getOutPutSize()
 {
