@@ -61,10 +61,8 @@ void ConvolutionalLayer::feedForward(Layer * pNextLayer)
 	pNextLayer->acceptInput(mOutput);
 }
 
-std::vector<Eigen::MatrixXd> ConvolutionalLayer::backPropagate()
+void ConvolutionalLayer::backPropagate(Layer * pPreviousLayer)
 {//MOCK
-	std::vector< Eigen::MatrixXd> fake;
-	return fake;
 }
 
 

@@ -21,7 +21,7 @@ public:
 	virtual ~Layer();
 
 	virtual void feedForward(Layer * pNextLayer) = 0;
-	virtual std::vector<Eigen::MatrixXd> backPropagate() = 0;
+	virtual void backPropagate(Layer * pPreviousLayer) = 0;
 	virtual void acceptInput(const std::vector<Eigen::MatrixXd>&) = 0;
 
 	int getSizeX();
@@ -40,6 +40,9 @@ protected:
 
 	std::vector<Eigen::MatrixXd> mInput;
 	std::vector<Eigen::MatrixXd> mOutput;
-
+	std::vector<Eigen::MatrixXd> mGradOfActivation;
+	std::vector<Eigen::MatrixXd> mDeltaOfLayer;
+	
+	const double ETA = -0.4;
 };
 

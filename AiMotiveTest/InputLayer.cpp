@@ -22,11 +22,9 @@ void InputLayer::feedForward(Layer * pNextLayer)
 {
 	pNextLayer->acceptInput(mInput);
 }
-
-std::vector<Eigen::MatrixXd> InputLayer::backPropagate()
+void InputLayer::backPropagate(Layer * pPreviousLayer)
 {//mock
-	std::vector< Eigen::MatrixXd> fake;
-	return fake;
+
 }
 
 

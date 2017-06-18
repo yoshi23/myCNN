@@ -11,17 +11,20 @@ public:
 	~FullyConnectedLayer();
 
 	void feedForward(Layer * pNextLayer);
-	virtual std::vector< Eigen::MatrixXd> backPropagate();
+	virtual void backPropagate(Layer * pPreviousLayer);
 	void acceptInput(const std::vector<Eigen::MatrixXd>&);
-
+	
 
 protected:
 	void calculateActivation();
-private:
+	void calculateActivationGradient();
+	void weightUpdate();
+	void biasUpdate();
+
 	//TODO: COULD HAVE A COMMON PARENT CLASS WITH CONVOLUTIONAL LAYER!
 	typedef std::vector<Eigen::MatrixXd> Weights; //these will comprise the depth of a kernel/Kernel
 	std::vector<Weights > mWeights;
-	std::vector<Eigen::MatrixXd> mBiases;
+	std::vector<double> mBiases;
 
 };
 

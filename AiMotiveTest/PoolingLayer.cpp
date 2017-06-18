@@ -38,10 +38,8 @@ void PoolingLayer::feedForward(Layer * pNextLayer)
 
 }
 
-std::vector<Eigen::MatrixXd> PoolingLayer::backPropagate()
+void PoolingLayer::backPropagate(Layer * pPreviousLayer)
 {//mock
-	std::vector<Eigen::MatrixXd> fake;
-	return fake;
 }
 
 void PoolingLayer::acceptInput(const std::vector<Eigen::MatrixXd>& iInput) 

@@ -19,7 +19,7 @@ public:
 	void convolve();
 
 	virtual void feedForward(Layer * pNextLayer);
-	virtual std::vector<Eigen::MatrixXd> backPropagate();
+	virtual void backPropagate(Layer * pPreviousLayer);
 	void acceptInput(const std::vector<Eigen::MatrixXd>&);
 
 private:

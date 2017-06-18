@@ -10,19 +10,20 @@
 
 #include "Network.h"
 
-
-
 #include "ConvolutionalLayer.h"
 
 int main()
 {
-
-
-
-
 	Network wNetwork;
 	wNetwork.initialize("..\\NetworkDescription.config", IMAGE_WIDTH, IMAGE_WIDTH); //image size IMAGE_WIDTH can be easily made dynamic of course.
-	wNetwork.run();
+	
+	int dir(1);
+	while (dir <=12 &&
+		-1 != wNetwork.run("..\\images\\train52\\" + std::to_string(dir) + "\\" + std::to_string(dir) + "_", dir + 1))
+	{
+		++dir;
+	}
+
 	//IoHandler wIoHandler;
 
 	//IoHandler::rgbPixelMap inputImage = wIoHandler.loadImage("..\\images\\trainIMAGE_WIDTH\\6\\6_0093.bmp");
