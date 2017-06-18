@@ -21,16 +21,18 @@ int Layer::getSizeY()
 	return mSizeY;
 }
 
-Eigen::MatrixXd Layer::convolution(const Eigen::MatrixXd &matrix, const Eigen::MatrixXd &kernel, const Layer::ConvolTypes & iType )
+Eigen::MatrixXd Layer::convolution(const Eigen::MatrixXd &matrix, const Eigen::MatrixXd &kernel, const Layer::ConvolTypes & iType)
 {
 	using namespace Eigen;
 	MatrixXd retMat;
-	MatrixXd flippedKernel = kernel.colwise().reverse().rowwise().reverse();
+	MatrixXd flippedKernel;
 
 	const int wKernelHeight = kernel.rows();
 	const int wKernelWidth = kernel.cols();
 	if (iType == ConvolTypes::Valid)
 	{
+		flippedKernel = kernel.colwise().reverse().rowwise().reverse(); //normal rotation during 2D convolution.
+		
 		retMat.resize(matrix.rows() - wKernelHeight + 1, matrix.cols() - wKernelWidth + 1);
 		int x(0), y(0);
 		for (int i = 0; i <= matrix.rows() - wKernelHeight; ++i)
@@ -43,8 +45,11 @@ Eigen::MatrixXd Layer::convolution(const Eigen::MatrixXd &matrix, const Eigen::M
 			y = 0;
 		}
 	}
-	else if (iType == ConvolTypes::Full)
+	else if (iType == ConvolTypes::Full || iType == ConvolTypes::DoubleFlip)
 	{
+		if (iType == ConvolTypes::Full)	flippedKernel = kernel.colwise().reverse().rowwise().reverse(); //normal rotation during 2D convolution.
+		else flippedKernel = kernel; //equivalent to double flipping.
+
 		MatrixXd paddedMatrix = MatrixXd::Zero(matrix.rows() + 2* wKernelHeight - 2, matrix.cols() + 2*wKernelWidth - 2);
 		paddedMatrix.block(wKernelWidth - 1, wKernelHeight - 1, matrix.rows(), matrix.cols()) = matrix;
 		retMat.resize(matrix.rows() + wKernelHeight - 1, matrix.cols() + wKernelWidth - 1);
@@ -58,10 +63,6 @@ Eigen::MatrixXd Layer::convolution(const Eigen::MatrixXd &matrix, const Eigen::M
 			++x;
 			y = 0;
 		}
-	}
-	else if (iType == ConvolTypes::Same)
-	{
-		//MOCK, not needed now.
 	}
 
 	return retMat;

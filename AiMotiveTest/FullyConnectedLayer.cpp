@@ -111,7 +111,7 @@ void FullyConnectedLayer::calculateActivation()
 
 void FullyConnectedLayer::calculateActivationGradient()
 {
-	double epsilon = 0.01;
+	
 	for (int i = 0; i < mSizeX; ++i)
 	{
 		double result(0);

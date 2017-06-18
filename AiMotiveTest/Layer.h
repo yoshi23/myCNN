@@ -13,8 +13,13 @@ public:
 	enum ConvolTypes
 	{
 		Full,
-		Same,
-		Valid
+		//Same, <--This type is not needed.
+		Valid, 
+		DoubleFlip //this is not a standard convolution type. 
+		//I just want to explit for performance that for the 
+		//convolution layer, during backpropagation we use 
+		//the flipped kernel, so for the convolution 
+		//we would flip twice, instead I just don't flip.
 	};
 
 	Layer();
@@ -47,5 +52,6 @@ protected:
 
 	
 	const double ETA = -0.4;
+	const double epsilon = 0.01; //for calculating activation gradients
 };
 
