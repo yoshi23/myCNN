@@ -17,6 +17,6 @@ namespace IoHandling
 
 	void saveWeightsAndBiases(const std::list<Layer*> & iLayers, const int & ID);
 	void loadWeightsAndBiases(Layer* iLayer);
-
+	void nameTable(const std::vector<Eigen::MatrixXd>& iOuptut, const double& iError);
 };
 

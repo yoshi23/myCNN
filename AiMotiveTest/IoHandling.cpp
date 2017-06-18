@@ -201,4 +201,36 @@ namespace IoHandling
 	}
 
 
+	void nameTable(const std::vector<Eigen::MatrixXd> & iOuptut, const double & iError)
+	{
+		std::vector<std::string> SignTypes =
+		{
+			"Dangerous Cliff",
+			"Road Works",
+			"Stop Sign",
+			"End Of Main Route",
+			"No Entry",
+			"Danger from Above",
+			"Speedlimit 130",
+			"No Stopping",
+			"Roundabout",
+			"Pedestrian route",
+			"Highway",
+			"Crosswalk"
+		};
+
+		double maxInd(0);
+		for (int i = 1; i < iOuptut[0].rows(); ++i)
+		{
+			if (iOuptut[0](i, 0) > iOuptut[0](maxInd, 0))
+			{
+				maxInd = i;
+			}
+		}
+		std::cout << iOuptut[0] << std::endl;
+		std::cout << "Error rate: " << iError << std::endl;
+		std::cout << "This is a " + SignTypes[maxInd] + " sign.\n";
+
+	}
+
 }

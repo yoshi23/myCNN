@@ -24,16 +24,14 @@ OutputLayer::~OutputLayer()
 
 void OutputLayer::provideOutput()
 {
-	std::cout << "Network forward propagation has reached the end of the network! Hurray!\n";
-	std::cout << mOutput[0];
+	IoHandling::nameTable(mOutput,mError);
 }
 
 void OutputLayer::feedForward(const Eigen::MatrixXd & iExpectedOutput)
 {
 	calculateActivation();
-	provideOutput();
 	calculateError(iExpectedOutput);
-	std::cout << "\nError: " << mError << std::endl;
+	provideOutput();
 }
 
 void OutputLayer::backPropagate(Layer * pPreviousLayer, const Eigen::MatrixXd & iExpectedOutput)
@@ -87,29 +85,13 @@ void OutputLayer::calc_d_Error_d_Activation(const Eigen::MatrixXd & iExpectedOut
 
 void OutputLayer::calcDeltaOfLayer()
 {
-/*	for (int i = 0; i < mOutput[0].rows(); ++i)
-	{
-		mD_Error_d_Activation(i, 0) = mOutput[0](i, 0) - iExpectedOutput(i, 0);
-	}*/
 	mDeltaOfLayer[0] = mD_Error_d_Activation.cwiseProduct(mGradOfActivation[0]);
 }
-
-/*void OutputLayer::weightUpdate()
-{
-	std::vector<Weights > d_Error_d_Weight(mWeights.size());
-	for (int i = 0; i < mWeights.size(); ++i)
-	{
-
-	}
-
-}*/
-
 
 void OutputLayer::acceptErrorOfPrevLayer(const std::vector<Eigen::MatrixXd>& ideltaErrorOfPrevLayer)
 {
 	mDeltaErrorOfPrevLayer = ideltaErrorOfPrevLayer;
 }
-
 
 double OutputLayer::getOutputError()
 {
