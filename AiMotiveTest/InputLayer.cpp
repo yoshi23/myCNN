@@ -37,3 +37,7 @@ void InputLayer::acceptInput(const std::vector<Eigen::MatrixXd>& iImage)
 InputLayer::~InputLayer()
 {
 }
+
+void InputLayer::acceptErrorOfPrevLayer(const std::vector<Eigen::MatrixXd>& ideltaErrorOfPrevLayer)
+{
+}

@@ -70,3 +70,9 @@ void ConvolutionalLayer::acceptInput(const std::vector<Eigen::MatrixXd>& iInputM
 {
 	mInput = iInputMap;
 }
+
+
+void ConvolutionalLayer::acceptErrorOfPrevLayer(const std::vector<Eigen::MatrixXd>& ideltaErrorOfPrevLayer)
+{
+	mdeltaErrorOfPrevLayer = ideltaErrorOfPrevLayer;
+}

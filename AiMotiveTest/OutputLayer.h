@@ -11,7 +11,7 @@ public:
 
 	void feedForward();
 	void backPropagate(Layer * pPreviousLayer, const Eigen::MatrixXd & iExpectedOutput);
-	
+	void acceptErrorOfPrevLayer(const std::vector<Eigen::MatrixXd>& ideltaErrorOfPrevLayer);
 
 private:
 	double mError;
@@ -20,6 +20,7 @@ private:
 	void calculateError(const Eigen::MatrixXd & iExpectedOutput);
 	void calc_d_Error_d_Activation(const Eigen::MatrixXd & iExpectedOutput);
 	void calcDeltaOfLayer();
+	
 	//void weightUpdate();
 	
 };

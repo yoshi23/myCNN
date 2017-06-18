@@ -13,6 +13,8 @@ public:
 	void feedForward(Layer * pNextLayer);
 	virtual void backPropagate(Layer * pPreviousLayer);
 	void acceptInput(const std::vector<Eigen::MatrixXd>&);
+
+	void acceptErrorOfPrevLayer(const std::vector<Eigen::MatrixXd>& ideltaErrorOfPrevLayer);
 	
 
 protected:
@@ -20,6 +22,8 @@ protected:
 	void calculateActivationGradient();
 	void weightUpdate();
 	void biasUpdate();
+
+	void calcDeltaOfLayer();
 
 	//TODO: COULD HAVE A COMMON PARENT CLASS WITH CONVOLUTIONAL LAYER!
 	typedef std::vector<Eigen::MatrixXd> Weights; //these will comprise the depth of a kernel/Kernel

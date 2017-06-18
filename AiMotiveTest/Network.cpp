@@ -157,10 +157,10 @@ int Network::run(const std::string & iDirectory, const int & dirNum)
 
 			while (it != mLayers.begin())
 			{
-				pCurrentLayer->backPropagate(pPreviousLayer);
 				pCurrentLayer = *it;
 				--it;
 				pPreviousLayer = *it;
+				pCurrentLayer->backPropagate(pPreviousLayer);
 			}
 
 

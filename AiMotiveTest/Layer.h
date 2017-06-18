@@ -23,6 +23,7 @@ public:
 	virtual void feedForward(Layer * pNextLayer) = 0;
 	virtual void backPropagate(Layer * pPreviousLayer) = 0;
 	virtual void acceptInput(const std::vector<Eigen::MatrixXd>&) = 0;
+	virtual void acceptErrorOfPrevLayer(const std::vector<Eigen::MatrixXd>&) = 0;
 
 	int getSizeX();
 	int getSizeY();
@@ -42,6 +43,8 @@ protected:
 	std::vector<Eigen::MatrixXd> mOutput;
 	std::vector<Eigen::MatrixXd> mGradOfActivation;
 	std::vector<Eigen::MatrixXd> mDeltaOfLayer;
+	std::vector<Eigen::MatrixXd> mdeltaErrorOfPrevLayer;
+
 	
 	const double ETA = -0.4;
 };

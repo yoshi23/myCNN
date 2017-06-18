@@ -42,6 +42,27 @@ void OutputLayer::backPropagate(Layer * pPreviousLayer, const Eigen::MatrixXd & 
 	calcDeltaOfLayer();
 	weightUpdate();
 	biasUpdate();
+
+
+	std::vector<Eigen::MatrixXd> wWeightedDeltaOfLayer(mInput.size()); 
+	//MY_WARNING: THESE NESTED LOOPS ARE A POTENTIAL SOURCE OF PROBLEMS
+	for (int neuronInPrevLayerX = 0; neuronInPrevLayerX < mInput[0].rows(); ++neuronInPrevLayerX)
+	{
+		for (int neuronInPrevLayerY = 0; neuronInPrevLayerY < mInput[0].cols(); ++neuronInPrevLayerY)
+		{
+			for (int inputFeatureMaps = 0; inputFeatureMaps < mInput.size(); ++inputFeatureMaps)
+			{
+				wWeightedDeltaOfLayer[inputFeatureMaps] = Eigen::MatrixXd::Zero(mInput[inputFeatureMaps].rows(), mInput[inputFeatureMaps].cols());
+				for (int neuronInThisLayer = 0; neuronInThisLayer < wWeightedDeltaOfLayer.size(); ++neuronInThisLayer)
+				{
+					wWeightedDeltaOfLayer[inputFeatureMaps](neuronInPrevLayerX, neuronInPrevLayerY) 
+						+= mWeights[neuronInThisLayer][inputFeatureMaps](neuronInPrevLayerX, neuronInPrevLayerY) * mDeltaOfLayer[0](neuronInThisLayer,0);
+				}
+			}
+		}
+	}
+	pPreviousLayer->acceptErrorOfPrevLayer(wWeightedDeltaOfLayer);
+
 }
 
 //Calculating standard error function
@@ -80,3 +101,9 @@ void OutputLayer::calcDeltaOfLayer()
 	}
 
 }*/
+
+
+void OutputLayer::acceptErrorOfPrevLayer(const std::vector<Eigen::MatrixXd>& ideltaErrorOfPrevLayer)
+{
+	mdeltaErrorOfPrevLayer = ideltaErrorOfPrevLayer;
+}

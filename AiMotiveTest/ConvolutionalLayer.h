@@ -22,6 +22,8 @@ public:
 	virtual void backPropagate(Layer * pPreviousLayer);
 	void acceptInput(const std::vector<Eigen::MatrixXd>&);
 
+	void acceptErrorOfPrevLayer(const std::vector<Eigen::MatrixXd>& ideltaErrorOfPrevLayer);
+
 private:
 
 	typedef std::vector<Eigen::MatrixXd> Kernel; //these will comprise the depth of a kernel/Kernel

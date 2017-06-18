@@ -22,7 +22,9 @@ private:
 	Method mMethod;
 	void downSample();
 
-	int poolingRegionX;
-	int poolingRegionY;
+	void acceptErrorOfPrevLayer(const std::vector<Eigen::MatrixXd>& ideltaErrorOfPrevLayer);
+
+	int mPoolingRegionX;
+	int mPoolingRegionY;
 };
 
