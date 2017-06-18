@@ -48,7 +48,7 @@ protected:
 	std::vector<Eigen::MatrixXd> mOutput;
 	std::vector<Eigen::MatrixXd> mGradOfActivation;
 	std::vector<Eigen::MatrixXd> mDeltaOfLayer;
-	std::vector<Eigen::MatrixXd> mdeltaErrorOfPrevLayer;
+	std::vector<Eigen::MatrixXd> mDeltaErrorOfPrevLayer;
 
 	
 	const double ETA = -0.4;

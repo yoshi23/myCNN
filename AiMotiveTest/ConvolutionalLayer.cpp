@@ -87,7 +87,7 @@ void ConvolutionalLayer::acceptInput(const std::vector<Eigen::MatrixXd>& iInputM
 
 void ConvolutionalLayer::acceptErrorOfPrevLayer(const std::vector<Eigen::MatrixXd>& ideltaErrorOfPrevLayer)
 {
-	mdeltaErrorOfPrevLayer = ideltaErrorOfPrevLayer;
+	mDeltaErrorOfPrevLayer = ideltaErrorOfPrevLayer;
 }
 
 void ConvolutionalLayer::calculateActivationGradient()
@@ -100,13 +100,15 @@ void ConvolutionalLayer::calculateActivationGradient()
 	{
 		Eigen::MatrixXd wNewFeatureMapLeft = Eigen::MatrixXd::Zero(mSizeX, mSizeY);
 		Eigen::MatrixXd wNewFeatureMapRight = Eigen::MatrixXd::Zero(mSizeX, mSizeY);
+		Eigen::MatrixXd wLeftApprox;
+		Eigen::MatrixXd wRightApprox;
 		for (unsigned int j = 0; j < mInput.size(); ++j)
 		{
-			wNewFeatureMapLeft = mInput[j] - epsilonMat;
-			wNewFeatureMapRight = mInput[j] + epsilonMat;
+			wLeftApprox = mInput[j] - epsilonMat;
+			wRightApprox = mInput[j] + epsilonMat;
 
-			wNewFeatureMapLeft += convolution(wNewFeatureMapLeft, mKernels[i][j], Layer::Valid);
-			wNewFeatureMapRight += convolution(wNewFeatureMapRight, mKernels[i][j], Layer::Valid);
+			wNewFeatureMapLeft += convolution(wLeftApprox, mKernels[i][j], Layer::Valid);
+			wNewFeatureMapRight += convolution(wRightApprox, mKernels[i][j], Layer::Valid);
 		}
 		wNewFeatureMapLeft -= mBias[i];
 		wNewFeatureMapRight -= mBias[i];
@@ -123,11 +125,13 @@ void ConvolutionalLayer::calcDeltaOfLayer()
 	mDeltaOfLayer.resize(mOutput.size());
 	for (unsigned int outputFeatureMaps = 0; outputFeatureMaps < mOutput.size(); ++outputFeatureMaps)
 	{
-		for (unsigned int inputFeatureMaps = 0; inputFeatureMaps < mInput.size(); ++inputFeatureMaps)
-		{
-			mDeltaOfLayer[outputFeatureMaps] += convolution(mdeltaErrorOfPrevLayer[outputFeatureMaps], mKernels[outputFeatureMaps][inputFeatureMaps], Layer::DoubleFlip)
+		//mDeltaOfLayer[outputFeatureMaps] = Eigen::MatrixXd::Zero(mSizeX, mSizeY);
+		//for (unsigned int inputFeatureMaps = 0; inputFeatureMaps < mInput.size(); ++inputFeatureMaps)
+		//{
+			//mDeltaOfLayer[outputFeatureMaps] += convolution(mDeltaErrorOfPrevLayer[outputFeatureMaps], mKernels[outputFeatureMaps][inputFeatureMaps], Layer::DoubleFlip)
+			mDeltaOfLayer[outputFeatureMaps] = mDeltaErrorOfPrevLayer[outputFeatureMaps]
 				.cwiseProduct(mGradOfActivation[outputFeatureMaps]);
-		}
+		//}
 	}
 }
 
@@ -135,39 +139,25 @@ void ConvolutionalLayer::calcDeltaOfLayer()
 
 void ConvolutionalLayer::weightUpdate()
 {
-	//std::vector<Eigen::MatrixXd> d_Error_d_Weight; 
-	//Kernels have the same size currently, so the [0][0] reference is valid for initiating for all sizes.
-	Eigen::MatrixXd d_Error_d_Weight = Eigen::MatrixXd::Zero(mKernels[0][0].rows(), mKernels[0][0].cols());
-
+	int wKernelWidth = mKernels[0][0].cols();
+	int wKernelHeight = mKernels[0][0].rows();
+	Eigen::MatrixXd d_Error_d_Weight = Eigen::MatrixXd::Zero(wKernelHeight, wKernelWidth);
 	for (unsigned int numKernel = 0; numKernel < mKernels.size(); ++numKernel)
 	{
-		//d_Error_d_Weight.resize(mKernels[numKernel].size());
-		for (unsigned int kernelDepth = 0; kernelDepth < mKernels.size(); ++kernelDepth)
+		for (unsigned int kernelDepth = 0; kernelDepth < mKernels[numKernel].size(); ++kernelDepth)
 		{
+			for (unsigned int inputSizeX = 0; inputSizeX < mInput[kernelDepth].rows() - wKernelHeight; ++inputSizeX)
+			{
+				for (unsigned int inputSizeY = 0; inputSizeY < mInput[kernelDepth].cols() - wKernelWidth; ++inputSizeY)
+				{
+					d_Error_d_Weight += mInput[kernelDepth].block(inputSizeX, inputSizeY, wKernelHeight, wKernelWidth)
+						*mDeltaOfLayer[kernelDepth](inputSizeX, inputSizeY);
+						//.cwiseProduct( mDeltaOfLayer[kernelDepth].block(inputSizeX, inputSizeY, wKernelHeight, wKernelWidth));
 
-
-			//d_Error_d_Weight += convolution()
-
-
-			//mInput[kernelDepth]()
-		//	for (unsigned int i = 0; i < d_Error_d_Weight.rows(); ++i)
-		//	{
-		//		for (unsigned int j = 0; j < d_Error_d_Weight.cols(); ++j)
-		//		{
-					for (unsigned int inputSizeX = 0; inputSizeX < mInput[kernelDepth].rows(); ++inputSizeX)
-					{
-						for (unsigned int inputSizeY = 0; inputSizeY < mInput[kernelDepth].cols(); ++inputSizeY)
-						{
-							d_Error_d_Weight += mInput[kernelDepth].block(inputSizeX, inputSizeY, mKernels[0][0].rows(), mKernels[0][0].cols())
-								.cwiseProduct( mDeltaOfLayer[kernelDepth]);
-
-						}
-					}
-					
-		//		}
-		//	}
+				}
+			}
 			mKernels[numKernel][kernelDepth] += ETA * d_Error_d_Weight;
-			d_Error_d_Weight = Eigen::MatrixXd::Zero(mKernels[0][0].rows(), mKernels[0][0].cols());
+			d_Error_d_Weight = Eigen::MatrixXd::Zero(wKernelHeight, wKernelWidth);
 		}
 	}
 }
@@ -179,6 +169,5 @@ void ConvolutionalLayer::biasUpdate()
 	{
 		d_Error_d_Bias = mDeltaOfLayer[depth];
 		mBias[depth] += (ETA * d_Error_d_Bias);
-
 	}
 }

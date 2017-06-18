@@ -18,7 +18,7 @@
 
 Network::Network()
 {
-	mRunningMode = Working;
+	mRunningMode = Learning; // Working;
 }
 
 
@@ -111,18 +111,26 @@ void Network::initialize(const std::string & iNetworkDescriptionFile, const int 
 
 int Network::run(const std::string & iDirectory, const int & dirNum)
 {
+	std::cout << "dirnum: " << dirNum << std::endl;
+
 	std::list<Layer*>::iterator it = mLayers.begin();
 	IoHandler wIoHandler;
 
-	for (int imCount = 0; imCount < 1; ++imCount)
+	Eigen::MatrixXd wExpectedOutput = Eigen::MatrixXd::Zero(mLayers.back()->getSizeX(), 1);
+	wExpectedOutput(dirNum - 1, 0) = 1;
+
+	std::cout << "\nExpected output: " << wExpectedOutput << "\n\n\n";
+
+	for (int imCount = 0; imCount < 1000; ++imCount)
 	{
 		std::stringstream sst;
-		sst << std::setfill('0') << std::setw(4) << 15;
+		sst << std::setfill('0') << std::setw(4) << imCount;
+		
 		std::string ordNum;
 		sst >> ordNum;
 		std::string imName = iDirectory + ordNum + ".bmp";
 		IoHandler::rgbPixelMap inputImage = wIoHandler.loadImage(imName);
-
+		//std::cout << "\nfile name to open: " << imName << std::endl << std::endl;
 		if (dynamic_cast<InputLayer*>(*it) != NULL)
 			(*it)->acceptInput(inputImage);
 		else
@@ -140,16 +148,13 @@ int Network::run(const std::string & iDirectory, const int & dirNum)
 			pCurrentLayer = *it;
 		}
 		--it;
-		dynamic_cast<OutputLayer*>(*it)->feedForward();
+		dynamic_cast<OutputLayer*>(*it)->feedForward(wExpectedOutput);
 
 
 		//If learning is switched on then we will backgpropagate the error
 		//and update the weights accordingly.
 		if (mRunningMode == Network::Learning)
 		{
-			Eigen::MatrixXd wExpectedOutput = Eigen::MatrixXd::Zero((*it)->getSizeX(), 1);
-			wExpectedOutput(dirNum-1, 0) = 1;
-
 			pCurrentLayer = *it;
 			--it;
 			Layer * pPreviousLayer = *it;
@@ -165,7 +170,10 @@ int Network::run(const std::string & iDirectory, const int & dirNum)
 
 
 		}
+
+		it = mLayers.begin();
+
 	}
 	
-
+	return 0;
 }

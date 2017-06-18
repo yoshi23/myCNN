@@ -45,10 +45,10 @@ void PoolingLayer::backPropagate(Layer * pPreviousLayer)
 
 	std::vector<Eigen::MatrixXd> wWeightedDeltaOfLayer(mInput.size());
 	//MY_WARNING: THESE NESTED LOOPS ARE A POTENTIAL SOURCE OF PROBLEMS
-	for (int neuronInPrevLayerX = 0; neuronInPrevLayerX < mInput[0].rows(); ++neuronInPrevLayerX)
+	for (int neuronInPrevLayerX = 0; neuronInPrevLayerX < mInput[0].rows() - mPoolingRegionY; ++neuronInPrevLayerX)
 	{
 		//mInput[0] is a valid measurement because in the config files we can only give homogenous kernel sizes.
-		for (int neuronInPrevLayerY = 0; neuronInPrevLayerY < mInput[0].cols(); ++neuronInPrevLayerY)
+		for (int neuronInPrevLayerY = 0; neuronInPrevLayerY < mInput[0].cols() - mPoolingRegionX; ++neuronInPrevLayerY)
 		{
 			for (int inputFeatureMaps = 0; inputFeatureMaps < mInput.size(); ++inputFeatureMaps)
 			{
@@ -129,5 +129,5 @@ void PoolingLayer::downSample()
 
 void PoolingLayer::acceptErrorOfPrevLayer(const std::vector<Eigen::MatrixXd>& ideltaErrorOfPrevLayer)
 {
-	mdeltaErrorOfPrevLayer = ideltaErrorOfPrevLayer;
+	mDeltaErrorOfPrevLayer = ideltaErrorOfPrevLayer;
 }

@@ -28,10 +28,12 @@ void OutputLayer::provideOutput()
 	std::cout << mOutput[0];
 }
 
-void OutputLayer::feedForward()
+void OutputLayer::feedForward(const Eigen::MatrixXd & iExpectedOutput)
 {
 	calculateActivation();
 	provideOutput();
+	calculateError(iExpectedOutput);
+	std::cout << "\nError: " << mError << std::endl;
 }
 
 void OutputLayer::backPropagate(Layer * pPreviousLayer, const Eigen::MatrixXd & iExpectedOutput)
@@ -105,5 +107,5 @@ void OutputLayer::calcDeltaOfLayer()
 
 void OutputLayer::acceptErrorOfPrevLayer(const std::vector<Eigen::MatrixXd>& ideltaErrorOfPrevLayer)
 {
-	mdeltaErrorOfPrevLayer = ideltaErrorOfPrevLayer;
+	mDeltaErrorOfPrevLayer = ideltaErrorOfPrevLayer;
 }

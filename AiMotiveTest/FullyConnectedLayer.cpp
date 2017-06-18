@@ -25,7 +25,7 @@ FullyConnectedLayer::FullyConnectedLayer(const int & iSizeX, const int & iNumOfI
 			newWeights[j] = Eigen::MatrixXd::Random(iSizeOfPrevLayerX, iSizeOfPrevLayerY);
 		}
 		mWeights[i] = newWeights;
-		mBiases[i] = Eigen::MatrixXd::Random(1, 1)(0, 0);
+		mBiases[i] = static_cast<double>(Eigen::MatrixXd::Random(1, 1)(0, 0));
 	}
 
 	mOutput.resize(0);
@@ -84,7 +84,7 @@ void FullyConnectedLayer::acceptInput(const std::vector<Eigen::MatrixXd>& iInput
 
 void FullyConnectedLayer::acceptErrorOfPrevLayer(const std::vector<Eigen::MatrixXd>& ideltaErrorOfPrevLayer)
 {
-	mdeltaErrorOfPrevLayer = ideltaErrorOfPrevLayer;
+	mDeltaErrorOfPrevLayer = ideltaErrorOfPrevLayer;
 }
 
 
@@ -111,9 +111,12 @@ void FullyConnectedLayer::calculateActivation()
 
 void FullyConnectedLayer::calculateActivationGradient()
 {
-	
+	mGradOfActivation.resize(mSizeX);
+	//Has a flat, vectorized strucutre --> we use 0 for indexing.
+	mGradOfActivation[0] = Eigen::MatrixXd::Zero(mSizeX, 1);
 	for (int i = 0; i < mSizeX; ++i)
 	{
+		
 		double result(0);
 		for (int j = 0; j < mInput.size(); ++j)
 		{
@@ -122,8 +125,8 @@ void FullyConnectedLayer::calculateActivationGradient()
 
 		}
 		result -= mBiases[i];
-		double leftResult;
-		double rightResult;
+		double leftResult = result;
+		double rightResult = result;
 		leftResult -= epsilon;
 		rightResult += epsilon;
 		sigmoid(leftResult, 1);
@@ -155,11 +158,12 @@ void FullyConnectedLayer::weightUpdate()
 
 void FullyConnectedLayer::biasUpdate()
 {
+	
 	Eigen::MatrixXd d_Error_d_Bias = Eigen::MatrixXd::Zero(mSizeX, mSizeY);
 	for (int neuron = 0; neuron < mSizeX; ++neuron)
 	{
-		d_Error_d_Bias(neuron,1) = mDeltaOfLayer[0](neuron, 0);
-		mBiases[neuron] += ETA * d_Error_d_Bias(neuron,1);
+		d_Error_d_Bias(neuron,0) = mDeltaOfLayer[0](neuron, 0);
+		mBiases[neuron] += ETA * d_Error_d_Bias(neuron,0);
 		
 	}
 }
@@ -167,6 +171,6 @@ void FullyConnectedLayer::biasUpdate()
 
 void FullyConnectedLayer::calcDeltaOfLayer()
 {
-
-	mDeltaOfLayer[0] = mdeltaErrorOfPrevLayer[0].cwiseProduct(mGradOfActivation[0]);
+	mDeltaOfLayer.resize(mOutput.size());
+	mDeltaOfLayer[0] = mDeltaErrorOfPrevLayer[0].cwiseProduct(mGradOfActivation[0]);
 }

@@ -9,7 +9,7 @@ public:
 	OutputLayer(const int & iSizeX, const int & iNumOfInputFeatureMaps, const int & iSizeOfPrevLayerX, const int & iSizeOfPrevLayerY);
 	~OutputLayer();
 
-	void feedForward();
+	void feedForward(const Eigen::MatrixXd & iExpectedOutput);
 	void backPropagate(Layer * pPreviousLayer, const Eigen::MatrixXd & iExpectedOutput);
 	void acceptErrorOfPrevLayer(const std::vector<Eigen::MatrixXd>& ideltaErrorOfPrevLayer);
 
