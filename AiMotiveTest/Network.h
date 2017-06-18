@@ -20,7 +20,7 @@ public:
 	bool isLearning();
 
 	void initialize(const int & iConfiguration);
-	int run(const std::string & iDirectory, const int & dirNum);
+	int run(const std::string & iDirectory);
 
 private:
 

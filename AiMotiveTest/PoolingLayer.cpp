@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "PoolingLayer.h"
-//#include "Dense"
 #include <vector>
-#include <iostream>
 PoolingLayer::PoolingLayer()
 {
 }
@@ -35,7 +33,6 @@ void PoolingLayer::feedForward(Layer * pNextLayer)
 {
 	downSample();
 	pNextLayer->acceptInput(mOutput);
-
 }
 
 void PoolingLayer::backPropagate(Layer * pPreviousLayer)
@@ -79,6 +76,11 @@ void PoolingLayer::acceptInput(const std::vector<Eigen::MatrixXd>& iInput)
 	mInput = iInput;
 }
 
+void PoolingLayer::acceptErrorOfPrevLayer(const std::vector<Eigen::MatrixXd>& ideltaErrorOfPrevLayer)
+{
+	mDeltaErrorOfPrevLayer = ideltaErrorOfPrevLayer;
+}
+
 void PoolingLayer::downSample()
 {
 	for (int i = 0; i < mInput.size(); ++i)
@@ -90,8 +92,7 @@ void PoolingLayer::downSample()
 					for (int y = 0; y < mSizeY; ++y)
 					{
 						for (int x = 0; x < mSizeX; ++x)
-						{
-							
+						{					
 							//We zero-pad the input matrix, so we can comfortably iterate through and do the max-pooling, even if the
 							//size of input is not a multiple of the size of region over which we want to do pooling.
 							//There might be unlucky cases when this results in taht the last row or column is just a single value,
@@ -113,7 +114,8 @@ void PoolingLayer::downSample()
 					break;
 				}
 				case Average:
-				{//MOCK
+				{
+					//MOCK
 					break;
 				}
 				default:
@@ -126,8 +128,3 @@ void PoolingLayer::downSample()
 }
 
 
-
-void PoolingLayer::acceptErrorOfPrevLayer(const std::vector<Eigen::MatrixXd>& ideltaErrorOfPrevLayer)
-{
-	mDeltaErrorOfPrevLayer = ideltaErrorOfPrevLayer;
-}

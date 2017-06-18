@@ -1,23 +1,20 @@
 #include "stdafx.h"
 #include "IoHandling.h"
-
 #include "SFML\Graphics\Image.hpp"
 #include <iostream>
 #include <list>
-
 #include <cstdio>
-
 #include "Dense"
 #include "Layer.h"
 #include "ConvolutionalLayer.h"
 #include "FullyConnectedLayer.h"
-
 #include <fstream>
 
 
+//#include <boost/archive/text_oarchive.hpp>
+
 namespace IoHandling
 {
-
 	rgbPixelMap loadImage(const std::string & iFileName)
 	{
 		sf::Image wImageFile;
@@ -48,38 +45,7 @@ namespace IoHandling
 		return retMap;
 	}
 
-
-	void writePixelMapToFile(const rgbPixelMap & iImage) {
-
-		FILE *fr = fopen("..\\images\\trainIMAGE_WIDTH\\matrixOutputRedR.txt", "w");
-		FILE *fg = fopen("..\\images\\trainIMAGE_WIDTH\\matrixOutputRedG.txt", "w");
-		FILE *fb = fopen("..\\images\\trainIMAGE_WIDTH\\matrixOutputRedB.txt", "w");
-		rgbPixelMap::const_iterator it = iImage.begin();
-
-		for (int i = 0; i < IMAGE_WIDTH; ++i) {
-			for (int j = 0; j < IMAGE_HEIGHT - 1; ++j) {
-				fprintf(fr, "%d, ", static_cast<int>(iImage[0](i, j)));
-				fprintf(fg, "%d, ", static_cast<int>(iImage[1](i, j)));
-				fprintf(fb, "%d, ", static_cast<int>(iImage[2](i, j)));
-				--it;
-				--it;
-			}
-			fprintf(fr, "%d ", iImage[0](i, 51));
-			fprintf(fg, "%d ", iImage[1](i, 51));
-			fprintf(fb, "%d ", iImage[2](i, 51));
-			--it;
-			--it;
-			fprintf(fr, "\n");
-			fprintf(fg, "\n");
-			fprintf(fb, "\n");
-		}
-
-		fclose(fr);
-		fclose(fg);
-		fclose(fb);
-		std::cout << "Writing to file finished\n";
-	}
-
+	//TODO: I WANT TO USE THE SERIALIZATION LIBRARY OF BOOST INSTEAD OF THIS. CURRENTLY NOT DONE WITH THAT.
 	void saveWeightsAndBiases(const std::list<Layer*> & iLayers, const int & ID)
 	{
 		std::string wFileName = "SavedParameters" + std::to_string(ID) + ".csv";
@@ -87,19 +53,19 @@ namespace IoHandling
 
 		std::list<Layer*>::const_iterator itLayer = iLayers.begin();
 
+		
 		while (itLayer != iLayers.end())
 		{
 			if (dynamic_cast<ConvolutionalLayer*>(*itLayer) != 0)
-			{/*
+			{
+				/*
 				for (int i = 0; i < (*itLayer)->getNumOfKernels(); ++i)
 				{
 					saveFile << "Kernel:\n";
 					saveFile << (*itLayer)->getKernel(i);
 					saveFile << "Bias:\n";
 					saveFile << (*itLayer)->getBiases(i);
-				}*/
-				
-				
+				}*/				
 			}
 			else if (dynamic_cast<FullyConnectedLayer*>(*itLayer) != 0)
 			{
@@ -113,94 +79,18 @@ namespace IoHandling
 						saveFile << "Bias:\n";
 						saveFile << itFull->getBiases(neuron);
 					}
-
-				
 				}
-
 			}
-			
 			++itLayer;
-
 		}
-		/*
-
-		std::string line;
-		std::stringstream sst;
-		std::string words;
-		char separationSymbols;
-
-		std::string layerType;
-		int ord = 0, m = 0, n = 0;
-		int numOfKernels = 0;
-
-		if (saveFile.is_open())
-		{
-			while (getline(saveFile, line))
-			{
-				typeAndSize newLayer;
-				if (line.size()>0 && line[0] != '#')
-				{
-					sst << line;
-					sst >> ord;
-					sst >> layerType;
-
-					switch (layerType[0])
-					{
-					case 'c':
-					{
-						newLayer.first = LayerTypes::Convolutional;
-						sst >> numOfKernels;
-						sst >> separationSymbols;
-						break;
-					}
-					case 'p': newLayer.first = LayerTypes::Pooling; break;
-					case 'f': newLayer.first = LayerTypes::FullyConnected; break;
-					case 'o': newLayer.first = LayerTypes::Output; break;
-					default: break;
-					}
-
-
-					sst >> m;
-					if (newLayer.first == Convolutional || newLayer.first == Pooling)
-					{
-						sst >> separationSymbols;
-						sst >> n;
-						if (newLayer.first == Convolutional)
-						{
-							newLayer.second = std::tuple<int, int, int>(numOfKernels, m, n);
-						}
-						else
-						{
-							newLayer.second = std::tuple<int, int, int>(1, m, n);
-						}
-
-					}
-					else
-					{
-						newLayer.second = std::tuple<int, int, int>(1, m, 1);
-					}
-					mStructure.push_back(newLayer);
-					sst.str(std::string());
-					sst.clear();
-				}
-
-			}
-		}
-		else
-		{
-			std::cout << "Opening config file failed!\n";
-		}
-		
-
-		*/
-
 	}
 
+	//TODO: NOT IMPLEMENTED YET.
 	void loadWeightsAndBiases(Layer * iLayer)
 	{
 	}
 
-
+	//writes the name of the road sign explicitly and information about the error rate.
 	void nameTable(const std::vector<Eigen::MatrixXd> & iOuptut, const double & iError)
 	{
 		std::vector<std::string> SignTypes =
@@ -219,7 +109,7 @@ namespace IoHandling
 			"Crosswalk"
 		};
 
-		double maxInd(0);
+		int maxInd(0);
 		for (int i = 1; i < iOuptut[0].rows(); ++i)
 		{
 			if (iOuptut[0](i, 0) > iOuptut[0](maxInd, 0))
@@ -229,8 +119,6 @@ namespace IoHandling
 		}
 		std::cout << iOuptut[0] << std::endl;
 		std::cout << "Error rate: " << iError << std::endl;
-		std::cout << "This is a " + SignTypes[maxInd] + " sign.\n";
-
+		std::cout << "DECISION: This is a dir #" + std::to_string(maxInd + 1) + " picture, a(n) "+ SignTypes[maxInd] + " sign.\n";
 	}
-
 }

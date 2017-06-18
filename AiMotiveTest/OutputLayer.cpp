@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "OutputLayer.h"
-#include <iostream>
 #include "IoHandling.h"
 #include <vector>
 
@@ -43,9 +42,9 @@ void OutputLayer::backPropagate(Layer * pPreviousLayer, const Eigen::MatrixXd & 
 	weightUpdate();
 	biasUpdate();
 
-
 	std::vector<Eigen::MatrixXd> wWeightedDeltaOfLayer(mInput.size()); 
-	//MY_WARNING: THESE NESTED LOOPS ARE A POTENTIAL SOURCE OF PROBLEMS
+
+	//WARNING: THESE NESTED LOOPS SHOULD BE RECONSIDERED ARE A POTENTIAL SOURCE OF PROBLEMS
 	for (int neuronInPrevLayerX = 0; neuronInPrevLayerX < mInput[0].rows(); ++neuronInPrevLayerX)
 	{
 		for (int neuronInPrevLayerY = 0; neuronInPrevLayerY < mInput[0].cols(); ++neuronInPrevLayerY)
@@ -75,6 +74,7 @@ void OutputLayer::calculateError(const Eigen::MatrixXd & iExpectedOutput)
 	mError /= (2 * mOutput[0].rows());
 }
 
+//Calculating the derivative of error as a function of activation
 void OutputLayer::calc_d_Error_d_Activation(const Eigen::MatrixXd & iExpectedOutput)
 {
 	for (int i = 0; i < mOutput[0].rows(); ++i)
