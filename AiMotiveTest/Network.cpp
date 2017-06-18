@@ -12,10 +12,13 @@
 #include <iostream>
 
 #include <algorithm>
-
+#include <string>
+#include <sstream>
+#include <iomanip>
 
 Network::Network()
 {
+	mRunningMode = Learning; // Working;
 }
 
 
@@ -28,7 +31,13 @@ Network::~Network()
 	);
 }
 
-void Network::initialize(const std::string & networkDescriptionFile, const int & iInputSizeX, const int & iInputSizeY)
+bool Network::isLearning()
+{
+	if (mRunningMode == Learning) return true;
+	else return false;
+}
+
+void Network::initialize(const std::string & iNetworkDescriptionFile, const int & iInputSizeX, const int & iInputSizeY)
 {
 	mLayers.resize(0);
 	InputLayer * pInputLayer = new InputLayer(iInputSizeX, iInputSizeY);
@@ -37,7 +46,7 @@ void Network::initialize(const std::string & networkDescriptionFile, const int &
 
 
 	NetworkDescriptor wNetworkDescriptor;
-	wNetworkDescriptor.readDescription(networkDescriptionFile);
+	wNetworkDescriptor.readDescription(iNetworkDescriptionFile);
 
 	std::vector<NetworkDescriptor::typeAndSize>::iterator itPrescripedLayer = wNetworkDescriptor.mStructure.begin();
 
@@ -100,25 +109,71 @@ void Network::initialize(const std::string & networkDescriptionFile, const int &
 }
 
 
-void Network::run()
+int Network::run(const std::string & iDirectory, const int & dirNum)
 {
+	std::cout << "dirnum: " << dirNum << std::endl;
+
 	std::list<Layer*>::iterator it = mLayers.begin();
 	IoHandler wIoHandler;
 
-	IoHandler::rgbPixelMap inputImage = wIoHandler.loadImage("..\\images\\train52\\6\\6_0093.bmp");
+	Eigen::MatrixXd wExpectedOutput = Eigen::MatrixXd::Zero(mLayers.back()->getSizeX(), 1);
+	wExpectedOutput(dirNum - 1, 0) = 1;
 
-	if(dynamic_cast<InputLayer*>(*it) != NULL)
-		(*it)->acceptInput(inputImage);
+	std::cout << "\nExpected output: " << wExpectedOutput << "\n\n\n";
 
-	Layer * wCurrentLayer = *it;
-	
-	while (++it != mLayers.end())
+	for (int imCount = 0; imCount < 1000; ++imCount)
 	{
-		Layer * wNextLayer = *it;
-		wCurrentLayer->feedForward(wNextLayer);
-		wCurrentLayer = *it;
-	}
-	--it;
-	dynamic_cast<OutputLayer*>(*it)->feedForward();
+		std::stringstream sst;
+		sst << std::setfill('0') << std::setw(4) << imCount;
+		
+		std::string ordNum;
+		sst >> ordNum;
+		std::string imName = iDirectory + ordNum + ".bmp";
+		IoHandler::rgbPixelMap inputImage = wIoHandler.loadImage(imName);
+		//std::cout << "\nfile name to open: " << imName << std::endl << std::endl;
+		if (dynamic_cast<InputLayer*>(*it) != NULL)
+			(*it)->acceptInput(inputImage);
+		else
+		{
+			std::cout << "Error: first layer of network is not an input layer. Abort.\n";
+			return -1;
+		}
 
+		Layer * pCurrentLayer = *it;
+
+		while (++it != mLayers.end())
+		{
+			Layer * pNextLayer = *it;
+			pCurrentLayer->feedForward(pNextLayer);
+			pCurrentLayer = *it;
+		}
+		--it;
+		dynamic_cast<OutputLayer*>(*it)->feedForward(wExpectedOutput);
+
+
+		//If learning is switched on then we will backgpropagate the error
+		//and update the weights accordingly.
+		if (mRunningMode == Network::Learning)
+		{
+			pCurrentLayer = *it;
+			--it;
+			Layer * pPreviousLayer = *it;
+			dynamic_cast<OutputLayer*>(pCurrentLayer)->backPropagate(pPreviousLayer, wExpectedOutput);
+
+			while (it != mLayers.begin())
+			{
+				pCurrentLayer = *it;
+				--it;
+				pPreviousLayer = *it;
+				pCurrentLayer->backPropagate(pPreviousLayer);
+			}
+
+
+		}
+
+		it = mLayers.begin();
+
+	}
+	
+	return 0;
 }

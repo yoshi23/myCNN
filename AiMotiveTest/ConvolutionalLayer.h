@@ -19,10 +19,18 @@ public:
 	void convolve();
 
 	virtual void feedForward(Layer * pNextLayer);
-	virtual std::vector<Eigen::MatrixXd> backPropagate();
+	virtual void backPropagate(Layer * pPreviousLayer);
 	void acceptInput(const std::vector<Eigen::MatrixXd>&);
 
+	void acceptErrorOfPrevLayer(const std::vector<Eigen::MatrixXd>& ideltaErrorOfPrevLayer);
+
+
+
 private:
+	void calculateActivationGradient();
+	void calcDeltaOfLayer();
+	void weightUpdate();
+	void biasUpdate();
 
 	typedef std::vector<Eigen::MatrixXd> Kernel; //these will comprise the depth of a kernel/Kernel
 	std::vector<Kernel > mKernels;
