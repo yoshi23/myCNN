@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "InputLayer.h"
 #include "Layer.h"
-//#include "Dense"
-#include <map>
+#include "IoHandling.h"
+
 InputLayer::InputLayer()
 {
 }

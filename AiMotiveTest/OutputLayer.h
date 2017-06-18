@@ -13,6 +13,8 @@ public:
 	void backPropagate(Layer * pPreviousLayer, const Eigen::MatrixXd & iExpectedOutput);
 	void acceptErrorOfPrevLayer(const std::vector<Eigen::MatrixXd>& ideltaErrorOfPrevLayer);
 
+	double getOutputError();
+
 private:
 	double mError;
 	Eigen::MatrixXd mD_Error_d_Activation;
