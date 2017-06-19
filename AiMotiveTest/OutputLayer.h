@@ -18,7 +18,7 @@ public:
 private:
 	double mError;
 	Eigen::MatrixXd mD_Error_d_Activation;
-	void provideOutput();
+	void provideOutput(const Eigen::MatrixXd & iExpectedOutput);
 
 	//Calculating standard error function
 	void calculateError(const Eigen::MatrixXd & iExpectedOutput);

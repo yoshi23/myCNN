@@ -83,6 +83,7 @@ namespace IoHandling
 			}
 			++itLayer;
 		}
+		saveFile.close();
 	}
 
 	//TODO: NOT IMPLEMENTED YET.
@@ -91,8 +92,11 @@ namespace IoHandling
 	}
 
 	//writes the name of the road sign explicitly and information about the error rate.
-	void nameTable(const std::vector<Eigen::MatrixXd> & iOuptut, const double & iError)
+	void nameTable(const std::vector<Eigen::MatrixXd> & iOuptut, const double & iError, const Eigen::MatrixXd & iExpectedOutput)
 	{
+		std::string wFileName = "..\\Error_rate.csv";
+		std::ofstream errorFile(wFileName, std::ofstream::out | std::ofstream::app);
+
 		std::vector<std::string> SignTypes =
 		{
 			"Dangerous Cliff",
@@ -110,15 +114,32 @@ namespace IoHandling
 		};
 
 		int maxInd(0);
+		int explicitHit(0);
 		for (int i = 1; i < iOuptut[0].rows(); ++i)
 		{
+			if (iExpectedOutput(i, 0) == 1)
+			{
+				explicitHit = i;
+			}
 			if (iOuptut[0](i, 0) > iOuptut[0](maxInd, 0))
 			{
 				maxInd = i;
 			}
 		}
+		
 		std::cout << iOuptut[0] << std::endl;
 		std::cout << "Error rate: " << iError << std::endl;
 		std::cout << "DECISION: This is a dir #" + std::to_string(maxInd + 1) + " picture, a(n) "+ SignTypes[maxInd] + " sign.\n";
+		if (maxInd == explicitHit)
+		{
+			std::cout << "PERFECT DECISION\n";
+			errorFile << iError << ", " << 1 << std::endl;
+		}
+		else
+		{
+			std::cout << "BAD DECISION\n";
+			errorFile << iError << ", " << 0 << std::endl;
+		}
+
 	}
 }

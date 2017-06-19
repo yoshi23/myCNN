@@ -50,7 +50,7 @@ protected:
 	std::vector<Eigen::MatrixXd> mDeltaErrorOfPrevLayer;
 
 	
-	const double ETA = -0.5;
+	const double ETA = -10; // -0.4;
 	const double epsilon = 0.01; //for calculating activation gradients
 };
 

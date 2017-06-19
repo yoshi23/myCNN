@@ -8,7 +8,7 @@ int main()
 {
 	Network wNetwork;
 
-	int networkConfiguration = 1; //This will determine which config file is loaded.
+	int networkConfiguration = 2; //This will determine which config file is loaded.
 
 	//This method will build up and connect the layers of the network.
 	wNetwork.initialize(networkConfiguration); //Given more time, a builder pattern would be implemented, to make the code more flexible.

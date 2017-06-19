@@ -4,13 +4,11 @@
 #include <vector>
 #include <set>
 #include "Layer.h"
-#include "InputLayer.h"
 #include "ConvolutionalLayer.h"
 #include "PoolingLayer.h"
 #include "FullyConnectedLayer.h"
 #include "OutputLayer.h"
 #include "IoHandling.h"
-
 #include <algorithm>
 #include <string>
 #include <sstream>
@@ -48,48 +46,35 @@ void Network::initialize(const int & iConfiguration)
 	std::srand((unsigned int)time(0)); //Random matrices are generated in the constructors of the layers, for the init values of the weights, etc.
 
 	mConfiguration = iConfiguration; //Decides which network configuration file to load.
-
-	mLayers.resize(0); 
-	//Retrospecitvely, this inputlayer is not very useful, could be ommitted, given more time.
-	InputLayer * pInputLayer = new InputLayer(IMAGE_HEIGHT, IMAGE_WIDTH);
-	mLayers.push_back(pInputLayer);
-	std::cout << "Input layer added with size: " << pInputLayer->getSizeX() << "x" << pInputLayer->getSizeY() << " as the 0th layer.\n";
-
 	//Loading the file which describes the structure of the network.
 	NetworkDescriptor wNetworkDescriptor;
 	std::string iNetworkDescriptionFile = "..\\NetworkDescription" + std::to_string(iConfiguration) + ".config";
 	std::cout << iNetworkDescriptionFile << std::endl;
 	wNetworkDescriptor.readDescription(iNetworkDescriptionFile);
 
+	int wNumOfInputFeatureMaps = 3;
+	int wSizeOfPrevLayerX = IMAGE_HEIGHT;
+	int wSizeOfPrevLayerY = IMAGE_WIDTH;
 
+	mLayers.resize(0);
 	std::vector<NetworkDescriptor::typeAndSize>::iterator itPrescripedLayer;
 	//Iterate through the loaded description and add the layers that were read from the config file.
-	for (
-			itPrescripedLayer = wNetworkDescriptor.mStructure.begin(); 
-			itPrescripedLayer != wNetworkDescriptor.mStructure.end();
-			++itPrescripedLayer
-		)
+	for (itPrescripedLayer = wNetworkDescriptor.mStructure.begin(); itPrescripedLayer != wNetworkDescriptor.mStructure.end(); ++itPrescripedLayer)
 	{
-		int wNumOfInputFeatureMaps = mLayers.back()->getOutPutSize();
-		int wSizeOfPrevLayerX = mLayers.back()->getSizeX();
-		int wSizeOfPrevLayerY = mLayers.back()->getSizeY();
-
 		switch (itPrescripedLayer->first)
 		{
 			case NetworkDescriptor::Convolutional:
 			{
-				//Size of network is calculated from the kernel sizes:
-				int wPrevLayerWidth = mLayers.back()->getSizeY();
-				int wPrevLayerHeight = mLayers.back()->getSizeX();
+				//Size of new layer is calculated from thesize of previous layer and kernel sizes:
 				int wNumOfKernels = std::get<0>(itPrescripedLayer->second);
 				int wKernelWidth = std::get<2>(itPrescripedLayer->second);
 				int wKernelHeight = std::get<1>(itPrescripedLayer->second);
-				int wNewLayerWidth = wPrevLayerWidth - std::get<2>(itPrescripedLayer->second) + 1;
-				int wNewLayerHeight = wPrevLayerHeight - std::get<1>(itPrescripedLayer->second) + 1;
+				int wNewLayerWidth = wSizeOfPrevLayerY - std::get<2>(itPrescripedLayer->second) + 1;
+				int wNewLayerHeight = wSizeOfPrevLayerX - std::get<1>(itPrescripedLayer->second) + 1;
 				ConvolutionalLayer * pNewLayer = new ConvolutionalLayer(wNewLayerWidth, wNewLayerHeight, wNumOfInputFeatureMaps, wNumOfKernels, wKernelWidth, wKernelHeight);
 				mLayers.push_back(pNewLayer);
 
-				std::cout << "Convolutional layer added with size: " << wNewLayerWidth << "x" << wNewLayerHeight
+				std::cout << "Convolutional layer added with size: " << wNewLayerHeight << "x" << wNewLayerWidth
 					<< "\n\t\twith " << wNumOfKernels << " Kernels of size: " << wKernelWidth << "x" << wKernelHeight
 					<< "; as the " << mLayers.size() - 1 << "th layer.\n";
 
@@ -121,6 +106,11 @@ void Network::initialize(const int & iConfiguration)
 				break;
 			}
 		}
+
+		//saving parameters about this layer for the creation of the next layer;
+		wNumOfInputFeatureMaps = mLayers.back()->getOutPutSize();
+		wSizeOfPrevLayerX = mLayers.back()->getSizeX();
+		wSizeOfPrevLayerY = mLayers.back()->getSizeY();
 	}
 }
 
@@ -147,7 +137,7 @@ int Network::run(const std::string & iDirectory)
 		}
 
 		wAlreadyTrainedSet.insert(std::make_pair(dirNum, imCount));
-		std::cout << std::endl <<"INPUT: training image is from directory: " << dirNum << " #" << imCount << std::endl;
+		std::cout << std::endl <<"INPUT: training image is from directory: #" << dirNum << "/image #" << imCount << std::endl;
 
 
 		std::list<Layer*>::iterator it = mLayers.begin();
@@ -167,10 +157,10 @@ int Network::run(const std::string & iDirectory)
 
 		//Feed image into the first layer of the network, the input layer.
 		//If first layer is not an input layer, return with -1.
-		if (dynamic_cast<InputLayer*>(*it) != NULL) (*it)->acceptInput(inputImage);
+		if (dynamic_cast<ConvolutionalLayer*>(*it) != NULL) (*it)->acceptInput(inputImage);
 		else
 		{
-			std::cout << "Error: first layer of network is not an input layer. Abort.\n";
+			std::cout << "Error: first hidden layer of network is not a convolutional layer. Abort.\n";
 			return -1;
 		}
 

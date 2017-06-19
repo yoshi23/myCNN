@@ -18,6 +18,6 @@ namespace IoHandling
 	void loadWeightsAndBiases(Layer* iLayer); //NOT IMPLEMENTED YET
 
 	 //writes the name of the road sign explicitly and information about the error rate.
-	void nameTable(const std::vector<Eigen::MatrixXd>& iOuptut, const double& iError);
+	void nameTable(const std::vector<Eigen::MatrixXd>& iOuptut, const double& iError, const Eigen::MatrixXd & iExpectedOutput);
 };
 

@@ -21,16 +21,16 @@ OutputLayer::~OutputLayer()
 {
 }
 
-void OutputLayer::provideOutput()
+void OutputLayer::provideOutput(const Eigen::MatrixXd & iExpectedOutput)
 {
-	IoHandling::nameTable(mOutput,mError);
+	IoHandling::nameTable(mOutput,mError, iExpectedOutput);
 }
 
 void OutputLayer::feedForward(const Eigen::MatrixXd & iExpectedOutput)
 {
 	calculateActivation();
 	calculateError(iExpectedOutput);
-	provideOutput();
+	provideOutput(iExpectedOutput);
 }
 
 void OutputLayer::backPropagate(Layer * pPreviousLayer, const Eigen::MatrixXd & iExpectedOutput)
@@ -77,10 +77,7 @@ void OutputLayer::calculateError(const Eigen::MatrixXd & iExpectedOutput)
 //Calculating the derivative of error as a function of activation
 void OutputLayer::calc_d_Error_d_Activation(const Eigen::MatrixXd & iExpectedOutput)
 {
-	for (int i = 0; i < mOutput[0].rows(); ++i)
-	{
-		mD_Error_d_Activation(i,0) = mOutput[0](i, 0) - iExpectedOutput(i, 0);
-	}
+		mD_Error_d_Activation = mOutput[0] - iExpectedOutput;
 }
 
 void OutputLayer::calcDeltaOfLayer()
