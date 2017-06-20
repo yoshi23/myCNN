@@ -41,7 +41,7 @@ bool Network::isLearning()
 	else return false;
 }
 
-void Network::initialize(const int & iConfiguration)
+void Network::build(const int & iConfiguration)
 {
 	std::srand((unsigned int)time(0)); //Random matrices are generated in the constructors of the layers, for the init values of the weights, etc.
 
@@ -74,7 +74,7 @@ void Network::initialize(const int & iConfiguration)
 				int wKernelHeight = std::get<1>(itPrescripedLayer->second);
 				int wNewLayerWidth = wSizeOfPrevLayerY - std::get<2>(itPrescripedLayer->second) + 1;
 				int wNewLayerHeight = wSizeOfPrevLayerX - std::get<1>(itPrescripedLayer->second) + 1;
-				ConvolutionalLayer * pNewLayer = new ConvolutionalLayer(wNewLayerWidth, wNewLayerHeight, wNumOfInputFeatureMaps, wNumOfKernels, wKernelWidth, wKernelHeight, wEta, wEpsilon);
+				ConvolutionalLayer * pNewLayer = new ConvolutionalLayer(wNewLayerWidth, wNewLayerHeight, wNumOfInputFeatureMaps, wNumOfKernels, wKernelWidth, wKernelHeight, wEta);
 				mLayers.push_back(pNewLayer);
 
 				std::cout << "Convolutional layer added with size: " << wNewLayerHeight << "x" << wNewLayerWidth
@@ -92,14 +92,14 @@ void Network::initialize(const int & iConfiguration)
 			}
 			case NetworkDescriptor::FullyConnected:
 			{
-				FullyConnectedLayer * pNewLayer = new FullyConnectedLayer(std::get<1>(itPrescripedLayer->second), wNumOfInputFeatureMaps, wSizeOfPrevLayerX, wSizeOfPrevLayerY, wEta, wEpsilon);
+				FullyConnectedLayer * pNewLayer = new FullyConnectedLayer(std::get<1>(itPrescripedLayer->second), wNumOfInputFeatureMaps, wSizeOfPrevLayerX, wSizeOfPrevLayerY, wEta);
 				mLayers.push_back(pNewLayer);
 				std::cout << "FullyConnected layer added with size: " << pNewLayer->getSizeX() << "x" << pNewLayer->getSizeY() << " as the " << mLayers.size() - 1 << "th layer.\n";
 				break;
 			}	
 			case NetworkDescriptor::Output:
 			{
-				OutputLayer * pNewLayer = new OutputLayer(std::get<1>(itPrescripedLayer->second), wNumOfInputFeatureMaps, wSizeOfPrevLayerX, wSizeOfPrevLayerY, wEta, wEpsilon);
+				OutputLayer * pNewLayer = new OutputLayer(std::get<1>(itPrescripedLayer->second), wNumOfInputFeatureMaps, wSizeOfPrevLayerX, wSizeOfPrevLayerY, wEta);
 				mLayers.push_back(pNewLayer);
 				std::cout << "Output layer added with size: " << pNewLayer->getSizeX() << "x" << pNewLayer->getSizeY() << " as the " << mLayers.size() - 1 << "th, last layer.\n";
 				break;
@@ -120,7 +120,7 @@ void Network::initialize(const int & iConfiguration)
 
 int Network::run(const std::string & iDirectory)
 {
-	int dirNum = 0;
+	int wDirNum = 0;
 	int imCount = 0;
 	std::set<std::pair<int, int> > wAlreadyTrainedSet;
 	std::set<std::pair<int, int> >::iterator itChecker = wAlreadyTrainedSet.begin();
@@ -128,47 +128,51 @@ int Network::run(const std::string & iDirectory)
 	//Looping over random images in random directory.
 	while(wAlreadyTrainedSet.size()<12*5000){
 
-		//dirNum = rand() % 12 + 1; //choose random directory between 1-12.
-		dirNum = rand() % 2 + 1; 
-		//if (wAlreadyTrainedSet.size()>6 && rand() % 4 == 0) dirNum = rand() % 12 + 1;
-		//else dirNum = 4;
-		//dirNum = 4;
+		//wDirNum = rand() % 12 + 1; //choose random directory between 1-12.
+		wDirNum = rand() % 12 + 1; 
+		//if (wAlreadyTrainedSet.size()>6 && rand() % 4 == 0) wDirNum = rand() % 12 + 1;
+		//else wDirNum = 4;
+		//wDirNum = 4;
 		imCount = rand() % 5000;  //choose random image 0-4999
 		//srand already initialized previously in this thread.
 
 
-		itChecker = wAlreadyTrainedSet.find(std::make_pair(dirNum, imCount));
+		itChecker = wAlreadyTrainedSet.find(std::make_pair(wDirNum, imCount));
 		while (itChecker != wAlreadyTrainedSet.end())
 		{
 			imCount = rand() % 5000;  //srand already initialized previously in this thread.
-			//dirNum = rand() % 12 + 1;
-			//if(rand()%4 == 0) dirNum = rand() % 12 + 1;
-			//else dirNum = 4;
-			//dirNum = 4;
-			dirNum = rand() % 2 + 1;
-			itChecker = wAlreadyTrainedSet.find(std::make_pair(dirNum, imCount));
+			//wDirNum = rand() % 12 + 1;
+			//if(rand()%4 == 0) wDirNum = rand() % 12 + 1;
+			//else wDirNum = 4;
+			//wDirNum = 4;
+			wDirNum = rand() % 12 + 1;
+			itChecker = wAlreadyTrainedSet.find(std::make_pair(wDirNum, imCount));
 		}
 
-		wAlreadyTrainedSet.insert(std::make_pair(dirNum, imCount));
-		std::cout << std::endl <<"INPUT: training image is from directory: #" << dirNum << "/image #" << imCount << std::endl;
+		wAlreadyTrainedSet.insert(std::make_pair(wDirNum, imCount));
+		std::cout << std::endl <<"INPUT: training image is from directory: #" << wDirNum << "/image #" << imCount << std::endl;
 
 
 		std::list<Layer*>::iterator it = mLayers.begin();
 
 		//Expected output is just a 1D vector with all-zero elements, except for the directory that we are currently in.
 		Eigen::MatrixXd wExpectedOutput = Eigen::MatrixXd::Zero(mLayers.back()->getSizeX(), 1);
-		wExpectedOutput(dirNum - 1, 0) = 1;
+		wExpectedOutput(wDirNum - 1, 0) = 1;
 
 		//Building the access name of the next image.
 		std::stringstream sst;
 		sst << std::setfill('0') << std::setw(4) << imCount;
-		std::string ordNum;
-		sst >> ordNum;
-		std::string imName = iDirectory + ordNum + ".bmp";
+		std::string wOrdNum;
+		sst >> wOrdNum;
+		std::string imName = iDirectory + std::to_string(wDirNum) + "\\" + std::to_string(wDirNum) + "_" + wOrdNum + ".bmp";
+
+		std::cout << imName<<std::endl;
+
 		IoHandling::rgbPixelMap inputImage = IoHandling::loadImage(imName);
 		//Image is loaded
 		//Normalize image
 		for(int rgb = 0; rgb<3; ++rgb) 	inputImage[rgb].normalize();	
+
 
 		//Feed image into the first layer of the network, the input layer.
 		//If first layer is not an input layer, return with -1.

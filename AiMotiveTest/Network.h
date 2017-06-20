@@ -19,7 +19,7 @@ public:
 
 	bool isLearning();
 
-	void initialize(const int & iConfiguration);
+	void build(const int & iConfiguration);
 	int run(const std::string & iDirectory);
 
 private:

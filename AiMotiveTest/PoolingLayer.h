@@ -26,5 +26,7 @@ private:
 
 	int mPoolingRegionX;
 	int mPoolingRegionY;
+
+	std::vector<Eigen::MatrixXd> mWeightedDeltaOfLayer;
 };
 

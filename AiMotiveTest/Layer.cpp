@@ -76,8 +76,11 @@ Eigen::MatrixXd Layer::convolution(const Eigen::MatrixXd &matrix, const Eigen::M
 
 void Layer::applyActivationFuncAndCalcGradient(double & iInput, double & iGradient)
 {
+	//std::cout << "in: " << iInput << std::endl;
 	iInput = 1 / (1 + exp(-iInput));
+	//std::cout << "inAFT: " << iInput << std::endl;
 	iGradient = iInput * (1 - iInput);
+	//std::cout << "g: " << iGradient << std::endl;
 	//By having this analytical gradient calculation, we restrict ourselves to having iTau = 1
 }
 

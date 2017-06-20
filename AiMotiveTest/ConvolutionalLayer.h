@@ -14,8 +14,7 @@ public:
 		const int & iNumOfLayers, 
 		const int & iKernelWidth, 
 		const int & iKernelHeight,
-		const double & iEta, 
-		const double & iEpsilon
+		const double & iEta
 	);
 	~ConvolutionalLayer();
 
@@ -30,8 +29,7 @@ public:
 
 
 private:
-	//void calculateActivationGradient();
-	void calcDeltaOfLayer();
+
 	void weightUpdate();
 	void biasUpdate();
 

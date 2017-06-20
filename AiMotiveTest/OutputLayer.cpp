@@ -7,8 +7,8 @@ OutputLayer::OutputLayer()
 {
 }
 
-OutputLayer::OutputLayer(const int & iSizeX, const int & iNumOfInputFeatureMaps, const int & iSizeOfPrevLayerX, const int & iSizeOfPrevLayerY, const double & iEta, const double & iEpsilon)
-	: FullyConnectedLayer(iSizeX, iNumOfInputFeatureMaps, iSizeOfPrevLayerX,  iSizeOfPrevLayerY,iEta, iEpsilon)
+OutputLayer::OutputLayer(const int & iSizeX, const int & iNumOfInputFeatureMaps, const int & iSizeOfPrevLayerX, const int & iSizeOfPrevLayerY, const double & iEta)
+	: FullyConnectedLayer(iSizeX, iNumOfInputFeatureMaps, iSizeOfPrevLayerX,  iSizeOfPrevLayerY,iEta)
 {
 	mError = 0;
 	mD_Error_d_Activation = Eigen::MatrixXd::Zero(iSizeX, 1);
@@ -35,7 +35,6 @@ void OutputLayer::feedForward(const Eigen::MatrixXd & iExpectedOutput)
 
 void OutputLayer::backPropagate(Layer * pPreviousLayer, const Eigen::MatrixXd & iExpectedOutput)
 {
-	calculateError(iExpectedOutput);
 	calc_d_Error_d_Activation(iExpectedOutput);
 	calcDeltaOfLayer();
 	weightUpdate();
@@ -74,24 +73,20 @@ void OutputLayer::calculateError(const Eigen::MatrixXd & iExpectedOutput)
 }
 
 
-#include <iostream>
-
 //Calculating the derivative of error as a function of activation
+
+#include <iostream>
 void OutputLayer::calc_d_Error_d_Activation(const Eigen::MatrixXd & iExpectedOutput)
 {
 		mD_Error_d_Activation = mOutput[0] - iExpectedOutput;
-		
+		//std::cout << "\nhiba:\n" << mD_Error_d_Activation << std::endl;
 }
 
 void OutputLayer::calcDeltaOfLayer()
 {
 	mDeltaOfLayer[0] = mD_Error_d_Activation.cwiseProduct(mGradOfActivation[0]);
-	std::cout << "error of activation: \n" << mD_Error_d_Activation << "\ngrad of actiovation: \n"<< mGradOfActivation[0]<<std::endl;
-}
-
-void OutputLayer::acceptErrorOfPrevLayer(const std::vector<Eigen::MatrixXd>& ideltaErrorOfPrevLayer)
-{
-	mDeltaErrorOfPrevLayer = ideltaErrorOfPrevLayer;
+	//std::cout << "\nmDeltaOfLayer:\n" << mDeltaOfLayer[0] << std::endl;
+	//std::cout << "\ngrad of act\n"<<mGradOfActivation[0] << std::endl;
 }
 
 double OutputLayer::getOutputError()

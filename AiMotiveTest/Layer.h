@@ -50,9 +50,8 @@ protected:
 	std::vector<Eigen::MatrixXd> mGradOfActivation;
 	std::vector<Eigen::MatrixXd> mDeltaOfLayer;
 	std::vector<Eigen::MatrixXd> mDeltaErrorOfPrevLayer;
-
 	
 	double mEta; //For learning rate. Read from config file;
-	double mEpsilon; //For calculating activation gradients. Read from config file;
+
 };
 

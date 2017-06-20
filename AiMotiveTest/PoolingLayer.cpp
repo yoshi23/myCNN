@@ -18,7 +18,6 @@ PoolingLayer::PoolingLayer(
 	mPoolingRegionY = iSizeY;
 	mMethod = iMethod;
 	mEta = 0; //unused for pooling
-	mEpsilon = 0;  //unused for pooling
 
 	for (int i = 0; i < iNumOfInputFeatureMaps; ++i)
 	{
@@ -39,38 +38,23 @@ void PoolingLayer::feedForward(Layer * pNextLayer)
 
 void PoolingLayer::backPropagate(Layer * pPreviousLayer)
 {
-	//Inverse pooling has to be done.
-	//Pooling does not introduce error.
-
-	std::vector<Eigen::MatrixXd> wWeightedDeltaOfLayer(mInput.size());
-	//MY_WARNING: THESE NESTED LOOPS ARE A POTENTIAL SOURCE OF PROBLEMS
-	for (int neuronInPrevLayerX = 0; neuronInPrevLayerX < mInput[0].rows() - mPoolingRegionY; ++neuronInPrevLayerX)
+	//delta error has been already calculated during feed forward phase.
+	//For a real system, it should be calculated seperately, because it slows down the system unnecessarily if we do not perform learning.
+	for (unsigned int inputMaps = 0; inputMaps < mInput.size(); ++inputMaps)
 	{
-		//mInput[0] is a valid measurement because in the config files we can only give homogenous kernel sizes.
-		for (int neuronInPrevLayerY = 0; neuronInPrevLayerY < mInput[0].cols() - mPoolingRegionX; ++neuronInPrevLayerY)
+		for (unsigned int x = 0; x < mWeightedDeltaOfLayer[inputMaps].cols(); ++x)
 		{
-			for (int inputFeatureMaps = 0; inputFeatureMaps < mInput.size(); ++inputFeatureMaps)
+			for (unsigned int y = 0; y < mWeightedDeltaOfLayer[inputMaps].rows(); ++y)
 			{
-				wWeightedDeltaOfLayer[inputFeatureMaps] = Eigen::MatrixXd::Zero(mInput[inputFeatureMaps].rows(), mInput[inputFeatureMaps].cols());
-				for (int neuronInThisLayer = 0; neuronInThisLayer < wWeightedDeltaOfLayer.size(); ++neuronInThisLayer)
+				if (mWeightedDeltaOfLayer[inputMaps](x,y) == 1)
 				{
-					for (int x = 0; x < mPoolingRegionX; ++x)
-					{
-						for (int y = 0; y < mPoolingRegionY; ++y)
-						{
-							Eigen::MatrixXd wSubRegion = mInput[inputFeatureMaps].block(mPoolingRegionY*y, mPoolingRegionX*x, mPoolingRegionY, mPoolingRegionX);
-							if (wSubRegion.maxCoeff() == wSubRegion(x,y))
-							{
-								wWeightedDeltaOfLayer[inputFeatureMaps](neuronInPrevLayerX + x, neuronInPrevLayerY + y) = wSubRegion(x, y);
-							}
-							
-						}
-					}
+					mWeightedDeltaOfLayer[inputMaps](x, y) = mDeltaErrorOfPrevLayer[inputMaps](x / mPoolingRegionX, y / mPoolingRegionY);
 				}
 			}
 		}
+		
 	}
-	pPreviousLayer->acceptErrorOfPrevLayer(wWeightedDeltaOfLayer);
+	pPreviousLayer->acceptErrorOfPrevLayer(mWeightedDeltaOfLayer);
 }
 
 void PoolingLayer::acceptInput(const std::vector<Eigen::MatrixXd>& iInput) 
@@ -85,8 +69,12 @@ void PoolingLayer::acceptErrorOfPrevLayer(const std::vector<Eigen::MatrixXd>& id
 
 void PoolingLayer::downSample()
 {
+	mWeightedDeltaOfLayer.resize(mInput.size());
+	Eigen::MatrixXd wSubRegion;
 	for (int i = 0; i < mInput.size(); ++i)
 	{
+			mWeightedDeltaOfLayer[i] = Eigen::MatrixXd::Zero(mInput[i].rows(), mInput[i].cols());
+
 			switch(mMethod)
 			{
 				case Max:
@@ -109,15 +97,27 @@ void PoolingLayer::downSample()
 					for (int y = 0; y < mSizeY; ++y)
 					{
 						for (int x = 0; x < mSizeX; ++x)
-						{					
-							mOutput[i](x, y) = mInput[i].block(mPoolingRegionY*y, mPoolingRegionX*x, mPoolingRegionY, mPoolingRegionX).maxCoeff();
+						{			
+							wSubRegion = mInput[i].block(mPoolingRegionY*y, mPoolingRegionX*x, mPoolingRegionY, mPoolingRegionX);
+							mOutput[i](x, y) = wSubRegion.maxCoeff();
+
+							for (int subX = 0; subX < mPoolingRegionX; ++subX)
+							{
+								for (int subY = 0; subY < mPoolingRegionY; ++subY)
+								{
+									if (wSubRegion.maxCoeff() == wSubRegion(subY, subX))
+									{
+										mWeightedDeltaOfLayer[i](mPoolingRegionY*y + subY, mPoolingRegionX*x + subX) = 1; //later, during backpropagation we will multiply this matrix by the delta of prev layer. 
+										//This way, only the max element will have non-zero value, and will forward the error through the layer.
+									}
+								}
+							}
 						}
 					}
 					break;
 				}
 				case Average:
-				{
-					//MOCK
+				{//MOCK
 					break;
 				}
 				default:
@@ -126,7 +126,6 @@ void PoolingLayer::downSample()
 				}
 			}
 	}
-
 }
 
 
