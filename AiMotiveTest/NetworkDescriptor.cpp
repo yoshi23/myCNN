@@ -22,6 +22,7 @@ void NetworkDescriptor::readDescription(const std::string & iFileName)
 	std::string line;
 	std::stringstream sst;
 	std::string words;
+	std::string symbols;
 	char separationSymbols;
 
 	std::string layerType;
@@ -32,8 +33,26 @@ void NetworkDescriptor::readDescription(const std::string & iFileName)
 	{
 		while (getline(configFile, line))
 		{
+
+			if (line.size() > 0 && line[0] == '*') //it means it is a algorithmic parameter for the network
+			{
+				sst << line;
+				sst >> separationSymbols;
+				sst >> symbols;
+				if (symbols == "ETA")
+				{
+					sst >> mEta;
+				}
+				else if (symbols == "EPSILON")
+				{
+					sst >> mEpsilon;
+				}
+				sst.str(std::string());
+				sst.clear();
+			}
+
 			typeAndSize newLayer;
-			if (line.size()>0 && line[0] != '#')
+			if (line.size()>0 && line[0] != '#' && line[0] != '*')
 			{
 				sst << line;
 				sst >> ord;

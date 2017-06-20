@@ -6,7 +6,14 @@ class OutputLayer :
 {
 public:
 	OutputLayer();
-	OutputLayer(const int & iSizeX, const int & iNumOfInputFeatureMaps, const int & iSizeOfPrevLayerX, const int & iSizeOfPrevLayerY);
+	OutputLayer(
+		const int & iSizeX, 
+		const int & iNumOfInputFeatureMaps,
+		const int & iSizeOfPrevLayerX,
+		const int & iSizeOfPrevLayerY,
+		const double & wEta,
+		const double & EPSILON
+	);
 	~OutputLayer();
 
 	void feedForward(const Eigen::MatrixXd & iExpectedOutput);

@@ -48,7 +48,7 @@ namespace IoHandling
 	//TODO: I WANT TO USE THE SERIALIZATION LIBRARY OF BOOST INSTEAD OF THIS. CURRENTLY NOT DONE WITH THAT.
 	void saveWeightsAndBiases(const std::list<Layer*> & iLayers, const int & ID)
 	{
-		std::string wFileName = "SavedParameters" + std::to_string(ID) + ".csv";
+	/*	std::string wFileName = "SavedParameters" + std::to_string(ID) + ".csv";
 		std::ofstream saveFile(wFileName);
 
 		std::list<Layer*>::const_iterator itLayer = iLayers.begin();
@@ -58,14 +58,14 @@ namespace IoHandling
 		{
 			if (dynamic_cast<ConvolutionalLayer*>(*itLayer) != 0)
 			{
-				/*
+				
 				for (int i = 0; i < (*itLayer)->getNumOfKernels(); ++i)
 				{
 					saveFile << "Kernel:\n";
 					saveFile << (*itLayer)->getKernel(i);
 					saveFile << "Bias:\n";
 					saveFile << (*itLayer)->getBiases(i);
-				}*/				
+				}			
 			}
 			else if (dynamic_cast<FullyConnectedLayer*>(*itLayer) != 0)
 			{
@@ -83,7 +83,7 @@ namespace IoHandling
 			}
 			++itLayer;
 		}
-		saveFile.close();
+		saveFile.close();*/
 	}
 
 	//TODO: NOT IMPLEMENTED YET.
