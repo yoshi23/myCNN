@@ -151,10 +151,10 @@ void ConvolutionalLayer::weightUpdate()
 
 void ConvolutionalLayer::biasUpdate()
 {
-	Eigen::MatrixXd d_Error_d_Bias = Eigen::MatrixXd::Zero(mSizeX, mSizeY);
+	Eigen::MatrixXd d_Error_d_Bias = Eigen::MatrixXd::Ones(mSizeX, mSizeY);
 	for (unsigned int depth = 0; depth < mBias.size(); ++depth)
 	{
-		d_Error_d_Bias = mDeltaOfLayer[depth];
+		d_Error_d_Bias *= (mDeltaOfLayer[depth].sum());
 		mBias[depth].noalias() += (mEta * d_Error_d_Bias);
 	}
 }
