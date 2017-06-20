@@ -12,8 +12,7 @@ public:
 		const int & iNumOfInputFeatureMaps,
 		const int & iSizeOfPrevLayerX,
 		const int & iSizeOfPrevLayerY,
-		const double & iEta,
-		const double & iEpsilon
+		const double & iEta
 	);
 	~FullyConnectedLayer();
 
@@ -27,7 +26,6 @@ protected:
 	void calculateActivation();
 	void weightUpdate();
 	void biasUpdate();
-	void calcDeltaOfLayer();
 
 	typedef std::vector<Eigen::MatrixXd> Weights; //these will comprise the depth of a kernel/Kernel
 	std::vector<Weights > mWeights;

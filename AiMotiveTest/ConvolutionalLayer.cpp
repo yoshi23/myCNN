@@ -10,10 +10,9 @@ ConvolutionalLayer::ConvolutionalLayer()
 {
 }
 
-ConvolutionalLayer::ConvolutionalLayer(const int & iWidth, const int & iHeight, const int & iNumOfInputFeatureMaps, const int & iNumOfKernels, const int & iKernelWidth, const int & iKernelHeight, const double & iEta, const double & iEpsilon)
+ConvolutionalLayer::ConvolutionalLayer(const int & iWidth, const int & iHeight, const int & iNumOfInputFeatureMaps, const int & iNumOfKernels, const int & iKernelWidth, const int & iKernelHeight, const double & iEta)
 {
-	mEta = iEta/ iNumOfInputFeatureMaps;
-	mEpsilon = iEpsilon;
+	mEta = iEta; // / iNumOfInputFeatureMaps;
 	mSizeX = iHeight;
 	mSizeY = iWidth;
 
@@ -25,7 +24,7 @@ ConvolutionalLayer::ConvolutionalLayer(const int & iWidth, const int & iHeight, 
 			newKernel[j] = Eigen::MatrixXd::Random(iKernelWidth, iKernelHeight);
 		}
 		mKernels.push_back(newKernel);
-		mBias.push_back(Eigen::MatrixXd::Ones(mSizeX, mSizeY) * ((double)rand() / RAND_MAX));
+		mBias.push_back(Eigen::MatrixXd::Ones(mSizeX, mSizeY) * (double)rand() / RAND_MAX); // / RAND_MAX)* ( iKernelWidth*iKernelHeight))); // RAND_MAX));
 	}
 	mOutput.resize(iNumOfKernels);
 	mGradOfActivation.resize(iNumOfKernels);
@@ -38,9 +37,6 @@ ConvolutionalLayer::~ConvolutionalLayer()
 
 void ConvolutionalLayer::convolve()
 {
-	mGradOfActivation.resize(mOutput.size());
-	Eigen::MatrixXd epsilonMat = Eigen::MatrixXd::Ones(mSizeX, mSizeY) * mEpsilon;
-	std::vector<Kernel >::iterator itKernel = mKernels.begin();
 	Eigen::MatrixXd wGradientOfActivation;
 	Eigen::MatrixXd wNewFeatureMap;
 	for (unsigned int i = 0; i < mKernels.size(); ++i)
@@ -52,13 +48,9 @@ void ConvolutionalLayer::convolve()
 			wNewFeatureMap += convolution(mInput[j], mKernels[i][j], Layer::Valid);
 		}
 		wNewFeatureMap -= mBias[i];
-
-		int wTau = 5;
 		applyActivationFuncAndCalcGradient(wNewFeatureMap, wGradientOfActivation);
-
 		mOutput[i] = wNewFeatureMap;
 		mGradOfActivation[i] = wGradientOfActivation;
-
 	}
 }
 
@@ -70,8 +62,6 @@ void ConvolutionalLayer::feedForward(Layer * pNextLayer)
 
 void ConvolutionalLayer::backPropagate(Layer * pPreviousLayer)
 {
-	//calculateActivationGradient(); //<--Already calculated during forward propagation
-	calcDeltaOfLayer();
 	weightUpdate();
 	biasUpdate();
 
@@ -99,27 +89,21 @@ void ConvolutionalLayer::acceptInput(const std::vector<Eigen::MatrixXd>& iInputM
 
 void ConvolutionalLayer::acceptErrorOfPrevLayer(const std::vector<Eigen::MatrixXd>& ideltaErrorOfPrevLayer)
 {
-	mDeltaErrorOfPrevLayer = ideltaErrorOfPrevLayer;
-}
-
-void ConvolutionalLayer::calcDeltaOfLayer()
-{
 	mDeltaOfLayer.resize(mOutput.size());
 	for (unsigned int outputFeatureMaps = 0; outputFeatureMaps < mOutput.size(); ++outputFeatureMaps)
 	{
-			mDeltaOfLayer[outputFeatureMaps] = mDeltaErrorOfPrevLayer[outputFeatureMaps]
-				.cwiseProduct(mGradOfActivation[outputFeatureMaps]);
+		mDeltaOfLayer[outputFeatureMaps] = ideltaErrorOfPrevLayer[outputFeatureMaps]
+			.cwiseProduct(mGradOfActivation[outputFeatureMaps]);
 	}
 }
-
 
 
 void ConvolutionalLayer::weightUpdate()
 {
 	int wKernelWidth = mKernels[0][0].cols();
 	int wKernelHeight = mKernels[0][0].rows();
-	//Eigen::MatrixXd d_Error_d_Weight = Eigen::MatrixXd::Zero(wKernelHeight, wKernelWidth);
-	double d_Error_d_Weight(0);
+	//Eigen::MatrixXd wD_Error_d_Weight = Eigen::MatrixXd::Zero(wKernelHeight, wKernelWidth);
+	double wD_Error_d_Weight(0);
 	for (unsigned int numKernel = 0; numKernel < mKernels.size(); ++numKernel)
 	{
 		for (unsigned int kernelDepth = 0; kernelDepth < mKernels[numKernel].size(); ++kernelDepth)
@@ -133,18 +117,18 @@ void ConvolutionalLayer::weightUpdate()
 					Eigen::MatrixXd wPrevActiveWindow = mInput[kernelDepth].block(x, y, mSizeX - wKernelHeight, mSizeY - wKernelWidth);
 					Eigen::MatrixXd wDeltaWindow = mDeltaOfLayer[numKernel].block(x, y, mSizeX - wKernelHeight, mSizeY - wKernelWidth);
 
-					d_Error_d_Weight = (wPrevActiveWindow.cwiseProduct(wDeltaWindow)).sum();
-					mKernels[numKernel][kernelDepth](x, y) += mEta * d_Error_d_Weight;
+					wD_Error_d_Weight = (wPrevActiveWindow.cwiseProduct(wDeltaWindow)).sum();
+					mKernels[numKernel][kernelDepth](x, y) += mEta * wD_Error_d_Weight;
 
-				//	d_Error_d_Weight += mInput[kernelDepth].block(x, y, wKernelHeight, wKernelWidth)
+				//	wD_Error_d_Weight += mInput[kernelDepth].block(x, y, wKernelHeight, wKernelWidth)
 				//		*mDeltaOfLayer[numKernel](x, y);
 						//*mDeltaOfLayer[kernelDepth](x, y);
 						//.cwiseProduct( mDeltaOfLayer[kernelDepth].block(x, y, wKernelHeight, wKernelWidth));
 
 				}
 			}
-			//mKernels[numKernel][kernelDepth] += mEta * d_Error_d_Weight;
-			//d_Error_d_Weight = Eigen::MatrixXd::Zero(wKernelHeight, wKernelWidth);
+			//mKernels[numKernel][kernelDepth] += mEta * wD_Error_d_Weight;
+			//wD_Error_d_Weight = Eigen::MatrixXd::Zero(wKernelHeight, wKernelWidth);
 		}
 	}
 }

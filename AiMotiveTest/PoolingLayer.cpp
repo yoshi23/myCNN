@@ -18,7 +18,6 @@ PoolingLayer::PoolingLayer(
 	mPoolingRegionY = iSizeY;
 	mMethod = iMethod;
 	mEta = 0; //unused for pooling
-	mEpsilon = 0;  //unused for pooling
 
 	for (int i = 0; i < iNumOfInputFeatureMaps; ++i)
 	{
@@ -44,10 +43,10 @@ void PoolingLayer::backPropagate(Layer * pPreviousLayer)
 
 	std::vector<Eigen::MatrixXd> wWeightedDeltaOfLayer(mInput.size());
 	//MY_WARNING: THESE NESTED LOOPS ARE A POTENTIAL SOURCE OF PROBLEMS
-	for (int neuronInPrevLayerX = 0; neuronInPrevLayerX < mInput[0].rows() - mPoolingRegionY; ++neuronInPrevLayerX)
+	for (int neuronInPrevLayerX = 0; neuronInPrevLayerX < mInput[0].rows() - mPoolingRegionX; ++neuronInPrevLayerX)
 	{
 		//mInput[0] is a valid measurement because in the config files we can only give homogenous kernel sizes.
-		for (int neuronInPrevLayerY = 0; neuronInPrevLayerY < mInput[0].cols() - mPoolingRegionX; ++neuronInPrevLayerY)
+		for (int neuronInPrevLayerY = 0; neuronInPrevLayerY < mInput[0].cols() - mPoolingRegionY; ++neuronInPrevLayerY)
 		{
 			for (int inputFeatureMaps = 0; inputFeatureMaps < mInput.size(); ++inputFeatureMaps)
 			{
@@ -61,7 +60,7 @@ void PoolingLayer::backPropagate(Layer * pPreviousLayer)
 							Eigen::MatrixXd wSubRegion = mInput[inputFeatureMaps].block(mPoolingRegionY*y, mPoolingRegionX*x, mPoolingRegionY, mPoolingRegionX);
 							if (wSubRegion.maxCoeff() == wSubRegion(x,y))
 							{
-								wWeightedDeltaOfLayer[inputFeatureMaps](neuronInPrevLayerX + x, neuronInPrevLayerY + y) = wSubRegion(x, y);
+								wWeightedDeltaOfLayer[inputFeatureMaps](neuronInPrevLayerY + y, neuronInPrevLayerX + x) = wSubRegion(x, y);
 							}
 							
 						}
@@ -85,8 +84,12 @@ void PoolingLayer::acceptErrorOfPrevLayer(const std::vector<Eigen::MatrixXd>& id
 
 void PoolingLayer::downSample()
 {
+	//std::vector<Eigen::MatrixXd> wWeightedDeltaOfLayer(mInput.size());
+
 	for (int i = 0; i < mInput.size(); ++i)
 	{
+			//wWeightedDeltaOfLayer[inputFeatureMaps] = Eigen::MatrixXd::Zero(mInput[inputFeatureMaps].rows(), mInput[inputFeatureMaps].cols());
+
 			switch(mMethod)
 			{
 				case Max:

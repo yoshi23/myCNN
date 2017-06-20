@@ -11,14 +11,12 @@ public:
 		const int & iNumOfInputFeatureMaps,
 		const int & iSizeOfPrevLayerX,
 		const int & iSizeOfPrevLayerY,
-		const double & wEta,
-		const double & EPSILON
+		const double & wEta
 	);
 	~OutputLayer();
 
 	void feedForward(const Eigen::MatrixXd & iExpectedOutput);
 	void backPropagate(Layer * pPreviousLayer, const Eigen::MatrixXd & iExpectedOutput);
-	void acceptErrorOfPrevLayer(const std::vector<Eigen::MatrixXd>& ideltaErrorOfPrevLayer);
 
 	double getOutputError();
 
@@ -35,8 +33,5 @@ private:
 
 	//Calculates delta error of layer.
 	void calcDeltaOfLayer();
-	
-	//void weightUpdate();
-	
 };
 

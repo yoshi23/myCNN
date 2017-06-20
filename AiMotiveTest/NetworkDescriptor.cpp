@@ -43,10 +43,6 @@ void NetworkDescriptor::readDescription(const std::string & iFileName)
 				{
 					sst >> mEta;
 				}
-				else if (symbols == "EPSILON")
-				{
-					sst >> mEpsilon;
-				}
 				sst.str(std::string());
 				sst.clear();
 			}
