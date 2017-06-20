@@ -8,14 +8,30 @@
 FullyConnectedLayer::FullyConnectedLayer()
 {
 }
-FullyConnectedLayer::FullyConnectedLayer(const int & iSizeX, const int & iNumOfInputFeatureMaps, const int & iSizeOfPrevLayerX, const int & iSizeOfPrevLayerY)
+FullyConnectedLayer::FullyConnectedLayer(
+	const int & iSizeX, 
+	const int & iNumOfInputFeatureMaps, 
+	const int & iSizeOfPrevLayerX,
+	const int & iSizeOfPrevLayerY,
+	const double & iEta, 
+	const double & iEpsilon
+)
 {
+	mEta = iEta / iNumOfInputFeatureMaps;
+	mEpsilon = iEpsilon;
 	mSizeX = iSizeX;
 	mSizeY = 1;
 
 	mWeights.resize(mSizeX);
 	mBiases.resize(mSizeX);
-	for (int i = 0; i < mWeights.size(); ++i)
+
+	mGradOfActivation.resize(1);
+	mGradOfActivation[0] = Eigen::MatrixXd::Zero(mSizeX, 1);
+
+	mOutput.resize(1);
+	mOutput[0] = (Eigen::MatrixXd::Zero(iSizeX, 1));
+
+	for (unsigned int i = 0; i < mWeights.size(); ++i)
 	{
 		Weights newWeights(iNumOfInputFeatureMaps);
 		Eigen::MatrixXd newBiases = Eigen::MatrixXd::Random(iNumOfInputFeatureMaps, 1);
@@ -26,10 +42,6 @@ FullyConnectedLayer::FullyConnectedLayer(const int & iSizeX, const int & iNumOfI
 		mWeights[i] = newWeights;
 		mBiases[i] = static_cast<double>(Eigen::MatrixXd::Random(1, 1)(0, 0));
 	}
-
-	mOutput.resize(0);
-	mOutput.push_back(Eigen::MatrixXd::Zero(iSizeX, 1));
-
 }
 
 
@@ -47,23 +59,21 @@ void FullyConnectedLayer::feedForward(Layer * pNextLayer)
 
 void FullyConnectedLayer::backPropagate(Layer * pPreviousLayer)
 {
-
-	calculateActivationGradient();
 	calcDeltaOfLayer();
 	weightUpdate();
 	biasUpdate();
 
 	std::vector<Eigen::MatrixXd> wWeightedDeltaOfLayer(mInput.size());
 	//MY_WARNING: THESE NESTED LOOPS ARE A POTENTIAL SOURCE OF PROBLEMS
-	for (int neuronInPrevLayerX = 0; neuronInPrevLayerX < mInput[0].rows(); ++neuronInPrevLayerX)
+	for (unsigned int neuronInPrevLayerX = 0; neuronInPrevLayerX < mInput[0].rows(); ++neuronInPrevLayerX)
 	{
 		//mInput[0] is a valid measurement because in the config files we can only give homogenous kernel sizes.
-		for (int neuronInPrevLayerY = 0; neuronInPrevLayerY < mInput[0].cols(); ++neuronInPrevLayerY)
+		for (unsigned int neuronInPrevLayerY = 0; neuronInPrevLayerY < mInput[0].cols(); ++neuronInPrevLayerY)
 		{
-			for (int inputFeatureMaps = 0; inputFeatureMaps < mInput.size(); ++inputFeatureMaps)
+			for (unsigned int inputFeatureMaps = 0; inputFeatureMaps < mInput.size(); ++inputFeatureMaps)
 			{
 				wWeightedDeltaOfLayer[inputFeatureMaps] = Eigen::MatrixXd::Zero(mInput[inputFeatureMaps].rows(), mInput[inputFeatureMaps].cols());
-				for (int neuronInThisLayer = 0; neuronInThisLayer < wWeightedDeltaOfLayer.size(); ++neuronInThisLayer)
+				for (unsigned int neuronInThisLayer = 0; neuronInThisLayer < wWeightedDeltaOfLayer.size(); ++neuronInThisLayer)
 				{
 					wWeightedDeltaOfLayer[inputFeatureMaps](neuronInPrevLayerX, neuronInPrevLayerY)
 						+= mWeights[neuronInThisLayer][inputFeatureMaps](neuronInPrevLayerX, neuronInPrevLayerY) * mDeltaOfLayer[0](neuronInThisLayer, 0);
@@ -86,86 +96,36 @@ void FullyConnectedLayer::acceptErrorOfPrevLayer(const std::vector<Eigen::Matrix
 	mDeltaErrorOfPrevLayer = ideltaErrorOfPrevLayer;
 }
 
-int FullyConnectedLayer::getDepth()
-{
-	return mWeights[0].size();
-}
-
-Eigen::MatrixXd FullyConnectedLayer::getWeights(const int & neuron, const int & depth)
-{
-	return mWeights[neuron][depth];
-}
-
-double FullyConnectedLayer::getBiases(const int & neuron)
-{
-	return mBiases[neuron];
-}
-
-
 void FullyConnectedLayer::calculateActivation()
 {
 	for (int i = 0; i < mSizeX; ++i)
 	{
-		double result(0);
+		double activation(0);
+		double gradient(0);
 		for (int j = 0; j < mInput.size(); ++j)
 		{
-
-			result += (mInput[j].cwiseProduct(mWeights[i][j])).sum();
-
+			activation += (mInput[j].cwiseProduct(mWeights[i][j])).sum();
 		}
-		result -= mBiases[i];
-		sigmoid(result, 1);
-		mOutput[0](i, 0) = result;
+		activation -= mBiases[i];
 
+		applyActivationFuncAndCalcGradient(activation, gradient);
+
+		mOutput[0](i, 0) = activation;
+		mGradOfActivation[0](i, 0) = gradient;
 	}
-
-
-
 }
-
-void FullyConnectedLayer::calculateActivationGradient()
-{
-	mGradOfActivation.resize(mSizeX);
-	//Has a flat, vectorized strucutre --> we use 0 for indexing.
-	mGradOfActivation[0] = Eigen::MatrixXd::Zero(mSizeX, 1);
-	for (int i = 0; i < mSizeX; ++i)
-	{
-		
-		double result(0);
-		for (int j = 0; j < mInput.size(); ++j)
-		{
-
-			result += (mInput[j].cwiseProduct(mWeights[i][j])).sum();
-
-		}
-		result -= mBiases[i];
-		double leftResult = result;
-		double rightResult = result;
-		leftResult -= epsilon;
-		rightResult += epsilon;
-		sigmoid(leftResult, 1);
-		sigmoid(rightResult, 1);
-
-		mGradOfActivation[0](i, 0) = (rightResult - leftResult) / (2 * epsilon);
-
-	}
-
-
-}
-
-
 
 void FullyConnectedLayer::weightUpdate()
 {
 	Eigen::MatrixXd d_Error_d_Weight; 
-	for (int neuron = 0; neuron < mWeights.size(); ++neuron)
+	for (unsigned int neuron = 0; neuron < mSizeX; ++neuron)
 	{
-		for (int inputFeatMap = 0; inputFeatMap < mWeights[neuron].size(); ++inputFeatMap)
+		for (unsigned int inputFeatMap = 0; inputFeatMap < mWeights[neuron].size(); ++inputFeatMap)
 		{
 			d_Error_d_Weight.resize(mWeights[neuron][inputFeatMap].rows(), mWeights[neuron][inputFeatMap].cols());
 			d_Error_d_Weight = mInput[inputFeatMap] * mDeltaOfLayer[0](neuron, 0);
 
-			mWeights[neuron][inputFeatMap] += ETA * d_Error_d_Weight;
+			mWeights[neuron][inputFeatMap] += mEta * d_Error_d_Weight;
 		}
 	}
 }
@@ -177,7 +137,7 @@ void FullyConnectedLayer::biasUpdate()
 	for (int neuron = 0; neuron < mSizeX; ++neuron)
 	{
 		d_Error_d_Bias(neuron,0) = mDeltaOfLayer[0](neuron, 0);
-		mBiases[neuron] += ETA * d_Error_d_Bias(neuron,0);
+		mBiases[neuron] += mEta * d_Error_d_Bias(neuron,0);
 		
 	}
 }

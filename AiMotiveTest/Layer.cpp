@@ -21,6 +21,11 @@ int Layer::getSizeY()
 	return mSizeY;
 }
 
+int Layer::getOutputDepth()
+{
+	return mOutput.size();
+}
+
 Eigen::MatrixXd Layer::convolution(const Eigen::MatrixXd &matrix, const Eigen::MatrixXd &kernel, const Layer::ConvolTypes & iType)
 {
 	using namespace Eigen;
@@ -69,27 +74,24 @@ Eigen::MatrixXd Layer::convolution(const Eigen::MatrixXd &matrix, const Eigen::M
 
 }
 
-void Layer::applyActivationFunction(Eigen::MatrixXd & iMatrix, const double & iTau)
+void Layer::applyActivationFuncAndCalcGradient(double & iInput, double & iGradient)
+{
+	iInput = 1 / (1 + exp(-iInput));
+	iGradient = iInput * (1 - iInput);
+	//By having this analytical gradient calculation, we restrict ourselves to having iTau = 1
+}
+
+void Layer::applyActivationFuncAndCalcGradient(Eigen::MatrixXd & iInput, Eigen::MatrixXd & iGradient /*, const double & iTau*/)
 {
 
-	for (int i = 0; i < iMatrix.rows(); ++i)
+	for (int i = 0; i < iInput.rows(); ++i)
 	{
-		for (int j = 0; j < iMatrix.cols(); ++j)
+		for (int j = 0; j < iInput.cols(); ++j)
 		{
-			sigmoid(iMatrix(i, j), iTau);
-			//iMatrix(i, j) = 1 / (1 + exp(-iTau * iMatrix(i, j)));
+			double & matrixElem = iInput(i, j);
+			matrixElem = 1 / (1 + exp(-matrixElem));
+			iGradient(i, j) = matrixElem * (1 - matrixElem);  //The analytical derivative of sigmoid(x).
+			//By having this analytical gradient calculation, we restrict ourselves to having iTau = 1
 		}
 	}
-}
-
-void Layer::sigmoid(double & iVal, const double & iTau)
-{
-	iVal = 1 / (1 + exp(-iTau * iVal));
-}
-
-
-
-int Layer::getOutPutSize()
-{
-	return mOutput.size();
 }

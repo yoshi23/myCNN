@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "PoolingLayer.h"
-//#include "Dense"
 #include <vector>
-#include <iostream>
 PoolingLayer::PoolingLayer()
 {
 }
@@ -19,6 +17,8 @@ PoolingLayer::PoolingLayer(
 	mPoolingRegionX = iSizeX;
 	mPoolingRegionY = iSizeY;
 	mMethod = iMethod;
+	mEta = 0; //unused for pooling
+	mEpsilon = 0;  //unused for pooling
 
 	for (int i = 0; i < iNumOfInputFeatureMaps; ++i)
 	{
@@ -35,7 +35,6 @@ void PoolingLayer::feedForward(Layer * pNextLayer)
 {
 	downSample();
 	pNextLayer->acceptInput(mOutput);
-
 }
 
 void PoolingLayer::backPropagate(Layer * pPreviousLayer)
@@ -79,6 +78,11 @@ void PoolingLayer::acceptInput(const std::vector<Eigen::MatrixXd>& iInput)
 	mInput = iInput;
 }
 
+void PoolingLayer::acceptErrorOfPrevLayer(const std::vector<Eigen::MatrixXd>& ideltaErrorOfPrevLayer)
+{
+	mDeltaErrorOfPrevLayer = ideltaErrorOfPrevLayer;
+}
+
 void PoolingLayer::downSample()
 {
 	for (int i = 0; i < mInput.size(); ++i)
@@ -87,33 +91,33 @@ void PoolingLayer::downSample()
 			{
 				case Max:
 				{
+					//We zero-pad the input matrix, so we can comfortably iterate through and do the max-pooling, even if the
+					//size of input is not a multiple of the size of region over which we want to do pooling.
+					//There might be unlucky cases when this results in taht the last row or column is just a single value,
+					//but this should not hinder the functioning on the system and it is the faster implementation for now.
+					int remainderX = mInput[i].cols() % mPoolingRegionX;
+					int remainderY = mInput[i].rows() % mPoolingRegionY;
+					if (remainderX != 0 || remainderY != 0)
+					{
+						Eigen::MatrixXd paddedMatrix = Eigen::MatrixXd::Zero(mInput[i].rows() + remainderX, mInput[i].cols() + remainderY);
+						paddedMatrix.block(0, 0, mInput[i].rows(), mInput[i].cols()) = mInput[i];
+						mInput[i] = paddedMatrix;
+					}
+					mPoolingRegionX = mInput[i].cols() / mSizeX;
+					mPoolingRegionY = mInput[i].rows() / mSizeY;
+
 					for (int y = 0; y < mSizeY; ++y)
 					{
 						for (int x = 0; x < mSizeX; ++x)
-						{
-							
-							//We zero-pad the input matrix, so we can comfortably iterate through and do the max-pooling, even if the
-							//size of input is not a multiple of the size of region over which we want to do pooling.
-							//There might be unlucky cases when this results in taht the last row or column is just a single value,
-							//but this should not hinder the functioning on the system and it is the faster implementation for now.
-							int remainderX = mInput[i].cols() % mPoolingRegionX;
-							int remainderY = mInput[i].rows() % mPoolingRegionY;
-							if (remainderX != 0 || remainderY != 0)
-							{
-								Eigen::MatrixXd paddedMatrix = Eigen::MatrixXd::Zero(mInput[i].rows() + remainderX, mInput[i].cols() + remainderY);
-								paddedMatrix.block(0,0, mInput[i].rows(), mInput[i].cols()) = mInput[i];
-								mInput[i] = paddedMatrix;
-							} 		
-							mPoolingRegionX = mInput[i].cols() / mSizeX;
-							mPoolingRegionY = mInput[i].rows() / mSizeY;
-
+						{					
 							mOutput[i](x, y) = mInput[i].block(mPoolingRegionY*y, mPoolingRegionX*x, mPoolingRegionY, mPoolingRegionX).maxCoeff();
 						}
 					}
 					break;
 				}
 				case Average:
-				{//MOCK
+				{
+					//MOCK
 					break;
 				}
 				default:
@@ -126,8 +130,3 @@ void PoolingLayer::downSample()
 }
 
 
-
-void PoolingLayer::acceptErrorOfPrevLayer(const std::vector<Eigen::MatrixXd>& ideltaErrorOfPrevLayer)
-{
-	mDeltaErrorOfPrevLayer = ideltaErrorOfPrevLayer;
-}

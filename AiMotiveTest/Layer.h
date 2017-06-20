@@ -31,12 +31,14 @@ public:
 
 	int getSizeX();
 	int getSizeY();
-	int getOutPutSize();
-
+	int getOutputDepth();
+	
 	Eigen::MatrixXd convolution(const Eigen::MatrixXd &matrix, const Eigen::MatrixXd &kernel, const Layer::ConvolTypes & iType);
 
-	void applyActivationFunction(Eigen::MatrixXd &matrix, const double & iTau);
-	void sigmoid(double & iVal, const double & iTau);
+
+	void applyActivationFuncAndCalcGradient(double & iInput,double &iGradient /*, const double & iTau*/);
+	void applyActivationFuncAndCalcGradient(Eigen::MatrixXd & iInput, Eigen::MatrixXd &iGradient /*, const double & iTau*/); 
+	//We switched to analytical calculation of the gradient of Sigmoid ( = s*(1-s)), but this restricts us to Tau = 1 at the moment.
 
 protected:
 
@@ -50,7 +52,7 @@ protected:
 	std::vector<Eigen::MatrixXd> mDeltaErrorOfPrevLayer;
 
 	
-	const double ETA = -0.2;
-	const double epsilon = 0.01; //for calculating activation gradients
+	double mEta; //For learning rate. Read from config file;
+	double mEpsilon; //For calculating activation gradients. Read from config file;
 };
 

@@ -143,7 +143,6 @@
   <ItemGroup>
     <ClInclude Include="ConvolutionalLayer.h" />
     <ClInclude Include="FullyConnectedLayer.h" />
-    <ClInclude Include="InputLayer.h" />
     <ClInclude Include="IoHandling.h" />
     <ClInclude Include="Layer.h" />
     <ClInclude Include="Network.h" />
@@ -157,7 +156,6 @@
     <ClCompile Include="AiMotiveTest.cpp" />
     <ClCompile Include="ConvolutionalLayer.cpp" />
     <ClCompile Include="FullyConnectedLayer.cpp" />
-    <ClCompile Include="InputLayer.cpp" />
     <ClCompile Include="IoHandling.cpp" />
     <ClCompile Include="Layer.cpp" />
     <ClCompile Include="Network.cpp" />

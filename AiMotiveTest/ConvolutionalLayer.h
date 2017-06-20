@@ -13,7 +13,10 @@ public:
 		const int & wNumOfInputFeatureMaps, 
 		const int & iNumOfLayers, 
 		const int & iKernelWidth, 
-		const int & iKernelHeight);
+		const int & iKernelHeight,
+		const double & iEta, 
+		const double & iEpsilon
+	);
 	~ConvolutionalLayer();
 
 	void convolve();
@@ -27,7 +30,7 @@ public:
 
 
 private:
-	void calculateActivationGradient();
+	//void calculateActivationGradient();
 	void calcDeltaOfLayer();
 	void weightUpdate();
 	void biasUpdate();
