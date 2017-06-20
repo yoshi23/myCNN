@@ -118,24 +118,33 @@ void ConvolutionalLayer::weightUpdate()
 {
 	int wKernelWidth = mKernels[0][0].cols();
 	int wKernelHeight = mKernels[0][0].rows();
-	Eigen::MatrixXd d_Error_d_Weight = Eigen::MatrixXd::Zero(wKernelHeight, wKernelWidth);
+	//Eigen::MatrixXd d_Error_d_Weight = Eigen::MatrixXd::Zero(wKernelHeight, wKernelWidth);
+	double d_Error_d_Weight(0);
 	for (unsigned int numKernel = 0; numKernel < mKernels.size(); ++numKernel)
 	{
 		for (unsigned int kernelDepth = 0; kernelDepth < mKernels[numKernel].size(); ++kernelDepth)
 		{
-			for (unsigned int inputSizeX = 0; inputSizeX < mInput[kernelDepth].rows() - wKernelHeight; ++inputSizeX)
+			//for (unsigned int x = 0; x < mInput[kernelDepth].rows() - wKernelHeight; ++x)
+			for (unsigned int x = 0; x < wKernelHeight; ++x)
 			{
-				for (unsigned int inputSizeY = 0; inputSizeY < mInput[kernelDepth].cols() - wKernelWidth; ++inputSizeY)
+				//for (unsigned int y = 0; y < mInput[kernelDepth].cols() - wKernelWidth; ++y)
+				for (unsigned int y = 0; y < wKernelWidth; ++y)
 				{
-					d_Error_d_Weight += mInput[kernelDepth].block(inputSizeX, inputSizeY, wKernelHeight, wKernelWidth)
-						*mDeltaOfLayer[numKernel](inputSizeX, inputSizeY);
-						//*mDeltaOfLayer[kernelDepth](inputSizeX, inputSizeY);
-						//.cwiseProduct( mDeltaOfLayer[kernelDepth].block(inputSizeX, inputSizeY, wKernelHeight, wKernelWidth));
+					Eigen::MatrixXd wPrevActiveWindow = mInput[kernelDepth].block(x, y, mSizeX - wKernelHeight, mSizeY - wKernelWidth);
+					Eigen::MatrixXd wDeltaWindow = mDeltaOfLayer[numKernel].block(x, y, mSizeX - wKernelHeight, mSizeY - wKernelWidth);
+
+					d_Error_d_Weight = (wPrevActiveWindow.cwiseProduct(wDeltaWindow)).sum();
+					mKernels[numKernel][kernelDepth](x, y) += mEta * d_Error_d_Weight;
+
+				//	d_Error_d_Weight += mInput[kernelDepth].block(x, y, wKernelHeight, wKernelWidth)
+				//		*mDeltaOfLayer[numKernel](x, y);
+						//*mDeltaOfLayer[kernelDepth](x, y);
+						//.cwiseProduct( mDeltaOfLayer[kernelDepth].block(x, y, wKernelHeight, wKernelWidth));
 
 				}
 			}
-			mKernels[numKernel][kernelDepth] += mEta * d_Error_d_Weight;
-			d_Error_d_Weight = Eigen::MatrixXd::Zero(wKernelHeight, wKernelWidth);
+			//mKernels[numKernel][kernelDepth] += mEta * d_Error_d_Weight;
+			//d_Error_d_Weight = Eigen::MatrixXd::Zero(wKernelHeight, wKernelWidth);
 		}
 	}
 }
