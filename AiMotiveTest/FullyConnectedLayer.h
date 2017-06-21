@@ -1,6 +1,5 @@
 #pragma once
 #include "Layer.h"
-//#include "Dense"
 #include <vector>
 class FullyConnectedLayer :
 	public Layer
@@ -27,7 +26,7 @@ protected:
 	void weightUpdate();
 	void biasUpdate();
 
-	typedef std::vector<Eigen::MatrixXd> Weights; //these will comprise the depth of a kernel/Kernel
+	typedef std::vector<Eigen::MatrixXd> Weights; //these will comprise the depth of a kernel.
 	std::vector<Weights > mWeights;
 	std::vector<double> mBiases;
 

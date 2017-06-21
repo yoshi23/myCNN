@@ -22,7 +22,6 @@ struct NetworkDescriptor
 	std::vector<typeAndSize> mStructure; //Stores the order and typeAndSize information provided. 
 
 	double mEta; //updating speed of learning of network
-	double mEpsilon; //for calculating activation gradients
 
 };
 

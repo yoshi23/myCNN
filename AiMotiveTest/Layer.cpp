@@ -26,6 +26,8 @@ int Layer::getOutputDepth()
 	return mOutput.size();
 }
 
+//Standard convolution functions implemented with 'full' and 'valid' approaches. 'Doubleflip' is just a shortcut for convolutional layers,
+//Where convoltuion is performed on flipped kernels during backpropagation.
 Eigen::MatrixXd Layer::convolution(const Eigen::MatrixXd &matrix, const Eigen::MatrixXd &kernel, const Layer::ConvolTypes & iType)
 {
 	using namespace Eigen;
@@ -53,7 +55,7 @@ Eigen::MatrixXd Layer::convolution(const Eigen::MatrixXd &matrix, const Eigen::M
 	else if (iType == ConvolTypes::Full || iType == ConvolTypes::DoubleFlip)
 	{
 		if (iType == ConvolTypes::Full)	flippedKernel = kernel.colwise().reverse().rowwise().reverse(); //normal rotation during 2D convolution.
-		else flippedKernel = kernel; //equivalent to double flipping.
+		else flippedKernel = kernel; //equivalent to double flipping. Neede for backprop on convolutional layers.
 
 		MatrixXd paddedMatrix = MatrixXd::Zero(matrix.rows() + 2* wKernelHeight - 2, matrix.cols() + 2*wKernelWidth - 2);
 		paddedMatrix.block(wKernelWidth - 1, wKernelHeight - 1, matrix.rows(), matrix.cols()) = matrix;
@@ -76,11 +78,8 @@ Eigen::MatrixXd Layer::convolution(const Eigen::MatrixXd &matrix, const Eigen::M
 
 void Layer::applyActivationFuncAndCalcGradient(double & iInput, double & iGradient)
 {
-	//std::cout << "in: " << iInput << std::endl;
 	iInput = 1 / (1 + exp(-iInput));
-	//std::cout << "inAFT: " << iInput << std::endl;
 	iGradient = iInput * (1 - iInput);
-	//std::cout << "g: " << iGradient << std::endl;
 	//By having this analytical gradient calculation, we restrict ourselves to having iTau = 1
 }
 

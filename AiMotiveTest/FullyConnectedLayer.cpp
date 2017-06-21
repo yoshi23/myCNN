@@ -16,7 +16,7 @@ FullyConnectedLayer::FullyConnectedLayer(
 	const double & iEta
 )
 {
-	mEta = iEta; // / iNumOfInputFeatureMaps;
+	mEta = iEta; 
 
 	mSizeX = iSizeX;
 	mSizeY = 1;
@@ -39,7 +39,7 @@ FullyConnectedLayer::FullyConnectedLayer(
 			newWeights[j] = Eigen::MatrixXd::Random(iSizeOfPrevLayerX, iSizeOfPrevLayerY);
 		}
 		mWeights[i] = newWeights;
-		mBiases[i] = static_cast<double>(Eigen::MatrixXd::Random(1, 1)(0, 0));// *iSizeOfPrevLayerX * iSizeOfPrevLayerY);
+		mBiases[i] = static_cast<double>(Eigen::MatrixXd::Random(1, 1)(0, 0));
 	}
 }
 
@@ -58,11 +58,15 @@ void FullyConnectedLayer::feedForward(Layer * pNextLayer)
 
 void FullyConnectedLayer::backPropagate(Layer * pPreviousLayer)
 {
+	//Algorithms are based on derivations found here:
+	//http://jefkine.com/general/2016/09/05/backpropagation-in-convolutional-neural-networks/
+	//https://grzegorzgwardys.wordpress.com/2016/04/22/8/
+	//https://github.com/integeruser/MNIST-cnn
+
 	weightUpdate();
 	biasUpdate();
 
 	std::vector<Eigen::MatrixXd> wWeightedDeltaOfLayer(mInput.size());
-	//MY_WARNING: THESE NESTED LOOPS ARE A POTENTIAL SOURCE OF PROBLEMS
 	for (unsigned int neuronInPrevLayerX = 0; neuronInPrevLayerX < mInput[0].rows(); ++neuronInPrevLayerX)
 	{
 		//mInput[0] is a valid measurement because in the config files we can only give homogenous kernel sizes.
@@ -80,6 +84,7 @@ void FullyConnectedLayer::backPropagate(Layer * pPreviousLayer)
 			}
 		}
 	}
+	//feed delta error for next layer.
 	pPreviousLayer->acceptErrorOfPrevLayer(wWeightedDeltaOfLayer);
 	
 }

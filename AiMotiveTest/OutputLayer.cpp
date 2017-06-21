@@ -40,9 +40,9 @@ void OutputLayer::backPropagate(Layer * pPreviousLayer, const Eigen::MatrixXd & 
 	weightUpdate();
 	biasUpdate();
 
-	std::vector<Eigen::MatrixXd> wWeightedDeltaOfLayer(mInput.size()); 
 
-	//WARNING: THESE NESTED LOOPS SHOULD BE RECONSIDERED ARE A POTENTIAL SOURCE OF PROBLEMS
+	//This layer is updated, we still have to calculate delta error for next layer: 	
+	std::vector<Eigen::MatrixXd> wWeightedDeltaOfLayer(mInput.size()); 
 	for (unsigned int neuronInPrevLayerX = 0; neuronInPrevLayerX < mInput[0].rows(); ++neuronInPrevLayerX)
 	{
 		for (unsigned int neuronInPrevLayerY = 0; neuronInPrevLayerY < mInput[0].cols(); ++neuronInPrevLayerY)
@@ -58,6 +58,7 @@ void OutputLayer::backPropagate(Layer * pPreviousLayer, const Eigen::MatrixXd & 
 			}
 		}
 	}
+	//feed delta error for next layer.
 	pPreviousLayer->acceptErrorOfPrevLayer(wWeightedDeltaOfLayer);
 
 }
@@ -74,19 +75,14 @@ void OutputLayer::calculateError(const Eigen::MatrixXd & iExpectedOutput)
 
 
 //Calculating the derivative of error as a function of activation
-
-#include <iostream>
 void OutputLayer::calc_d_Error_d_Activation(const Eigen::MatrixXd & iExpectedOutput)
 {
 		mD_Error_d_Activation = mOutput[0] - iExpectedOutput;
-		//std::cout << "\nhiba:\n" << mD_Error_d_Activation << std::endl;
 }
 
 void OutputLayer::calcDeltaOfLayer()
 {
 	mDeltaOfLayer[0] = mD_Error_d_Activation.cwiseProduct(mGradOfActivation[0]);
-	//std::cout << "\nmDeltaOfLayer:\n" << mDeltaOfLayer[0] << std::endl;
-	//std::cout << "\ngrad of act\n"<<mGradOfActivation[0] << std::endl;
 }
 
 double OutputLayer::getOutputError()

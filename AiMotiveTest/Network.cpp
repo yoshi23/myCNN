@@ -53,7 +53,6 @@ void Network::build(const int & iConfiguration)
 	wNetworkDescriptor.readDescription(iNetworkDescriptionFile);
 
 	double wEta = wNetworkDescriptor.mEta;
-	double wEpsilon = wNetworkDescriptor.mEpsilon;
 
 	int wNumOfInputFeatureMaps = 3;
 	int wSizeOfPrevLayerX = IMAGE_HEIGHT;
@@ -61,6 +60,7 @@ void Network::build(const int & iConfiguration)
 
 	mLayers.resize(0);
 	std::vector<NetworkDescriptor::typeAndSize>::iterator itPrescripedLayer;
+
 	//Iterate through the loaded description and add the layers that were read from the config file.
 	for (itPrescripedLayer = wNetworkDescriptor.mStructure.begin(); itPrescripedLayer != wNetworkDescriptor.mStructure.end(); ++itPrescripedLayer)
 	{
@@ -84,7 +84,7 @@ void Network::build(const int & iConfiguration)
 				break;
 			}
 			case NetworkDescriptor::Pooling:
-			{
+			{ 
 				PoolingLayer * pNewLayer = new PoolingLayer(std::get<1>(itPrescripedLayer->second), std::get<2>(itPrescripedLayer->second), PoolingLayer::Max, wNumOfInputFeatureMaps, wSizeOfPrevLayerX, wSizeOfPrevLayerY);
 				mLayers.push_back(pNewLayer);
 				std::cout << "Pooling layer added with size: " << pNewLayer->getSizeX() << "x" << pNewLayer->getSizeY() << " as the " << mLayers.size()-1 << "th layer.\n";
@@ -121,39 +121,31 @@ void Network::build(const int & iConfiguration)
 int Network::run(const std::string & iDirectory)
 {
 	int wDirNum = 0;
-	int imCount = 0;
+	int wImCount = 0;
 	std::set<std::pair<int, int> > wAlreadyTrainedSet;
 	std::set<std::pair<int, int> >::iterator itChecker = wAlreadyTrainedSet.begin();
 
 	//Looping over random images in random directory.
-	while(wAlreadyTrainedSet.size()<12*5000){
-
-		//wDirNum = rand() % 12 + 1; //choose random directory between 1-12.
+	while(wAlreadyTrainedSet.size() < 12 * 5000){
+		
+		//choose random directory between 1-12.
 		wDirNum = rand() % 12 + 1; 
-		//if (wAlreadyTrainedSet.size()>6 && rand() % 4 == 0) wDirNum = rand() % 12 + 1;
-		//else wDirNum = 4;
-		//wDirNum = 4;
-		imCount = rand() % 5000;  //choose random image 0-4999
+		wImCount = rand() % 5000;  //choose random image 0-4999
 		//srand already initialized previously in this thread.
 
 
-		itChecker = wAlreadyTrainedSet.find(std::make_pair(wDirNum, imCount));
+		itChecker = wAlreadyTrainedSet.find(std::make_pair(wDirNum, wImCount));
 		while (itChecker != wAlreadyTrainedSet.end())
 		{
-			imCount = rand() % 5000;  //srand already initialized previously in this thread.
-			//wDirNum = rand() % 12 + 1;
-			//if(rand()%4 == 0) wDirNum = rand() % 12 + 1;
-			//else wDirNum = 4;
-			//wDirNum = 4;
+			wImCount = rand() % 5000;  //srand already initialized previously in this thread.
 			wDirNum = rand() % 12 + 1;
-			itChecker = wAlreadyTrainedSet.find(std::make_pair(wDirNum, imCount));
+			itChecker = wAlreadyTrainedSet.find(std::make_pair(wDirNum, wImCount));
 		}
 
-		wAlreadyTrainedSet.insert(std::make_pair(wDirNum, imCount));
-		std::cout << std::endl <<"INPUT: training image is from directory: #" << wDirNum << "/image #" << imCount << std::endl;
+		//insert into index set, so we do not use this image for training again.
+		wAlreadyTrainedSet.insert(std::make_pair(wDirNum, wImCount));
+		std::cout << std::endl <<"INPUT: training image is from directory: #" << wDirNum << "/image #" << wImCount << std::endl;
 
-
-		std::list<Layer*>::iterator it = mLayers.begin();
 
 		//Expected output is just a 1D vector with all-zero elements, except for the directory that we are currently in.
 		Eigen::MatrixXd wExpectedOutput = Eigen::MatrixXd::Zero(mLayers.back()->getSizeX(), 1);
@@ -161,12 +153,10 @@ int Network::run(const std::string & iDirectory)
 
 		//Building the access name of the next image.
 		std::stringstream sst;
-		sst << std::setfill('0') << std::setw(4) << imCount;
+		sst << std::setfill('0') << std::setw(4) << wImCount;
 		std::string wOrdNum;
 		sst >> wOrdNum;
 		std::string imName = iDirectory + std::to_string(wDirNum) + "\\" + std::to_string(wDirNum) + "_" + wOrdNum + ".bmp";
-
-		std::cout << imName<<std::endl;
 
 		IoHandling::rgbPixelMap inputImage = IoHandling::loadImage(imName);
 		//Image is loaded
@@ -174,17 +164,17 @@ int Network::run(const std::string & iDirectory)
 		for(int rgb = 0; rgb<3; ++rgb) 	inputImage[rgb].normalize();	
 
 
+
 		//Feed image into the first layer of the network, the input layer.
 		//If first layer is not an input layer, return with -1.
-		if (dynamic_cast<ConvolutionalLayer*>(*it) != NULL) (*it)->acceptInput(inputImage);
-		else
-		{
-			std::cout << "Error: first hidden layer of network is not a convolutional layer. Abort.\n";
-			return -1;
-		}
+		std::list<Layer*>::iterator it = mLayers.begin();
+		if (dynamic_cast<ConvolutionalLayer*>(*it) == NULL) std::cout << "Warning: first hidden layer of network is not a convolutional layer. Abort.\n";
+		(*it)->acceptInput(inputImage);
 
-		//Entering the feedforwarding stage. Each layer gets the input first, process it and then passes on the output
-		//to the next layer, which is provided here.
+
+		//*********************FEEDFORWARD*******************************************
+		//Entering the feedforwarding stage. Each layer gets the input first, process
+		//it and then passes on the output to the next layer, which is provided here.
 		Layer * pCurrentLayer = *it;
 		while (++it != mLayers.end())
 		{
@@ -197,17 +187,19 @@ int Network::run(const std::string & iDirectory)
 		//Output layer is handled here seperately, because we the expected output is provided here.
 
 
+
+
 		//IF THE TRAINING ERROR IS BELOW CERTAIN LEVEL, WE COULD WRITE THE PARAMETERS INTO A FILE, 
 		//SO WE DO NOT HAVE TO TRAIN THE NETWORK AGAIN, IF WE DON'T WANT TO. NOT IMPLEMENTED YET.
-
 		/*if (dynamic_cast<OutputLayer*>(*it)->getOutputError() < 0.02)
-		{
 				IoHandling::saveWeightsAndBiases(mLayers, mConfiguration);
-		}*/
+		*/
 
-
-		//If learning is switched on then we will backgpropagate the error
-		//and update the weights accordingly.
+		
+		
+		//*******************BACKPROPAGATION***************************************
+		//If learning is switched on then we will backgpropagate the error, and 
+		//update the weights accordingly.
 		if (mRunningMode == Network::Learning)
 		{
 			pCurrentLayer = *it;

@@ -4,7 +4,7 @@
 #include <vector>
 
 
-
+//All other layertypes inherit from this. Abstract class.
 class Layer
 {
 public:
@@ -12,11 +12,9 @@ public:
 	enum ConvolTypes
 	{
 		Full,
-		//Same, <--This type is not needed.
 		Valid, 
 		DoubleFlip //this is not a standard convolution type. 
-		//I just want to explit for performance that for the 
-		//convolution layer, during backpropagation we use 
+		//In the convolution layer, during backpropagation we use 
 		//the flipped kernel, so for the convolution 
 		//we would flip twice, instead I just don't flip.
 	};
@@ -36,8 +34,8 @@ public:
 	Eigen::MatrixXd convolution(const Eigen::MatrixXd &matrix, const Eigen::MatrixXd &kernel, const Layer::ConvolTypes & iType);
 
 
-	void applyActivationFuncAndCalcGradient(double & iInput,double &iGradient /*, const double & iTau*/);
-	void applyActivationFuncAndCalcGradient(Eigen::MatrixXd & iInput, Eigen::MatrixXd &iGradient /*, const double & iTau*/); 
+	void applyActivationFuncAndCalcGradient(double & iInput,double &iGradient);
+	void applyActivationFuncAndCalcGradient(Eigen::MatrixXd & iInput, Eigen::MatrixXd &iGradient); 
 	//We switched to analytical calculation of the gradient of Sigmoid ( = s*(1-s)), but this restricts us to Tau = 1 at the moment.
 
 protected:

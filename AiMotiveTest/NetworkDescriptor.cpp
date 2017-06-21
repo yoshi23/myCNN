@@ -16,6 +16,7 @@ NetworkDescriptor::~NetworkDescriptor()
 {
 }
 
+//This method reads data from config files.
 void NetworkDescriptor::readDescription(const std::string & iFileName)
 {
 	std::ifstream configFile(iFileName);

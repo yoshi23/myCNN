@@ -39,7 +39,7 @@ void PoolingLayer::feedForward(Layer * pNextLayer)
 void PoolingLayer::backPropagate(Layer * pPreviousLayer)
 {
 	//delta error has been already calculated during feed forward phase.
-	//For a real system, it should be calculated seperately, because it slows down the system unnecessarily if we do not perform learning.
+	//For a "only running", not learning system, it should be calculated seperately, because it slows down the system unnecessarily if we do not perform learning.
 	for (unsigned int inputMaps = 0; inputMaps < mInput.size(); ++inputMaps)
 	{
 		for (unsigned int x = 0; x < mWeightedDeltaOfLayer[inputMaps].cols(); ++x)
@@ -54,6 +54,7 @@ void PoolingLayer::backPropagate(Layer * pPreviousLayer)
 		}
 		
 	}
+	//feed delta error for next layer in backpropagation.
 	pPreviousLayer->acceptErrorOfPrevLayer(mWeightedDeltaOfLayer);
 }
 
@@ -71,7 +72,7 @@ void PoolingLayer::downSample()
 {
 	mWeightedDeltaOfLayer.resize(mInput.size());
 	Eigen::MatrixXd wSubRegion;
-	for (int i = 0; i < mInput.size(); ++i)
+	for (unsigned int i = 0; i < mInput.size(); ++i)
 	{
 			mWeightedDeltaOfLayer[i] = Eigen::MatrixXd::Zero(mInput[i].rows(), mInput[i].cols());
 
