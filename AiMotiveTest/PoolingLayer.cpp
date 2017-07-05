@@ -21,7 +21,7 @@ PoolingLayer::PoolingLayer(
 
 	for (int i = 0; i < iNumOfInputFeatureMaps; ++i)
 	{
-		mOutput.push_back(Eigen::MatrixXd::Zero(mSizeX, mSizeY));
+		mOutput.push_back(Eigen::MatrixXd::Random(mSizeX, mSizeY));
 	}
 
 }

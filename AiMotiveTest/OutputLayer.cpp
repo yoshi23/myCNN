@@ -3,6 +3,9 @@
 #include "IoHandling.h"
 #include <vector>
 
+
+#include <iostream>
+
 OutputLayer::OutputLayer()
 {
 }
@@ -43,13 +46,14 @@ void OutputLayer::backPropagate(Layer * pPreviousLayer, const Eigen::MatrixXd & 
 
 	//This layer is updated, we still have to calculate delta error for next layer: 	
 	std::vector<Eigen::MatrixXd> wWeightedDeltaOfLayer(mInput.size()); 
-	for (unsigned int neuronInPrevLayerX = 0; neuronInPrevLayerX < mInput[0].rows(); ++neuronInPrevLayerX)
+	for (unsigned int inputFeatureMaps = 0; inputFeatureMaps < mInput.size(); ++inputFeatureMaps)
 	{
-		for (unsigned int neuronInPrevLayerY = 0; neuronInPrevLayerY < mInput[0].cols(); ++neuronInPrevLayerY)
+		wWeightedDeltaOfLayer[inputFeatureMaps] = Eigen::MatrixXd::Zero(mInput[inputFeatureMaps].rows(), mInput[inputFeatureMaps].cols());
+		for (unsigned int neuronInPrevLayerX = 0; neuronInPrevLayerX < mInput[0].rows(); ++neuronInPrevLayerX)
 		{
-			for (unsigned int inputFeatureMaps = 0; inputFeatureMaps < mInput.size(); ++inputFeatureMaps)
+			for (unsigned int neuronInPrevLayerY = 0; neuronInPrevLayerY < mInput[0].cols(); ++neuronInPrevLayerY)
 			{
-				wWeightedDeltaOfLayer[inputFeatureMaps] = Eigen::MatrixXd::Zero(mInput[inputFeatureMaps].rows(), mInput[inputFeatureMaps].cols());
+
 				for (unsigned int neuronInThisLayer = 0; neuronInThisLayer < wWeightedDeltaOfLayer.size(); ++neuronInThisLayer)
 				{
 					wWeightedDeltaOfLayer[inputFeatureMaps](neuronInPrevLayerX, neuronInPrevLayerY) 
@@ -58,7 +62,7 @@ void OutputLayer::backPropagate(Layer * pPreviousLayer, const Eigen::MatrixXd & 
 			}
 		}
 	}
-	//feed delta error for next layer.
+	
 	pPreviousLayer->acceptErrorOfPrevLayer(wWeightedDeltaOfLayer);
 
 }

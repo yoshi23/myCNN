@@ -30,5 +30,8 @@ protected:
 	std::vector<Weights > mWeights;
 	std::vector<double> mBiases;
 
+
+	//static int filecounter;
+
 };
 

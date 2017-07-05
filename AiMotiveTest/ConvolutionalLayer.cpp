@@ -12,7 +12,7 @@ ConvolutionalLayer::ConvolutionalLayer()
 
 ConvolutionalLayer::ConvolutionalLayer(const int & iWidth, const int & iHeight, const int & iNumOfInputFeatureMaps, const int & iNumOfKernels, const int & iKernelWidth, const int & iKernelHeight, const double & iEta)
 {
-	mEta = iEta; 
+	mEta = iEta;
 	mSizeX = iHeight;
 	mSizeY = iWidth;
 
@@ -50,8 +50,8 @@ void ConvolutionalLayer::backPropagate(Layer * pPreviousLayer)
 	//https://grzegorzgwardys.wordpress.com/2016/04/22/8/
 	//https://github.com/integeruser/MNIST-cnn
 
-	weightUpdate();
-	biasUpdate();
+	//weightUpdate();
+	//biasUpdate();
 
 	std::vector<Eigen::MatrixXd> wWeightedDeltaOfLayer(mInput.size());
 
@@ -76,6 +76,7 @@ void ConvolutionalLayer::acceptInput(const std::vector<Eigen::MatrixXd>& iInputM
 
 void ConvolutionalLayer::acceptErrorOfPrevLayer(const std::vector<Eigen::MatrixXd>& ideltaErrorOfPrevLayer)
 {
+
 	mDeltaOfLayer.resize(mOutput.size());
 	for (unsigned int outputFeatureMaps = 0; outputFeatureMaps < mOutput.size(); ++outputFeatureMaps)
 	{
